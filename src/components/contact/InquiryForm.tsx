@@ -5,6 +5,12 @@ import { useState, useTransition } from "react";
 import { submitInquiry } from "@/app/contact/actions";
 import type { InquiryType } from "@/lib/types";
 
+const fieldClass =
+  "w-full border-b border-charcoal/20 bg-transparent py-3 text-charcoal outline-none transition-[border-color,box-shadow] duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] focus:border-gold focus:shadow-[0_1px_0_0_var(--gold)]";
+
+const textareaClass =
+  "w-full resize-none border border-charcoal/20 bg-transparent p-4 text-charcoal outline-none transition-[border-color,box-shadow] duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] focus:border-gold focus:shadow-[0_0_0_1px_var(--gold)]";
+
 export function InquiryForm() {
   const searchParams = useSearchParams();
   const workSlug = searchParams.get("work") ?? undefined;
@@ -63,8 +69,10 @@ export function InquiryForm() {
   return (
     <form onSubmit={handleSubmit} className="space-y-8">
       {(workSlug || artistSlug) && (
-        <div className="border border-gold/20 bg-gold/5 px-4 py-3 text-sm text-charcoal/70">
-          {workSlug && <p>Inquiring about work: {workSlug.replace(/-/g, " ")}</p>}
+        <div className="border border-gold/20 bg-gold/5 px-4 py-3 text-sm text-charcoal/70 transition-opacity duration-500">
+          {workSlug && (
+            <p>Inquiring about work: {workSlug.replace(/-/g, " ")}</p>
+          )}
           {artistSlug && (
             <p>Inquiring about artist: {artistSlug.replace(/-/g, " ")}</p>
           )}
@@ -79,12 +87,7 @@ export function InquiryForm() {
           >
             Name *
           </label>
-          <input
-            id="name"
-            name="name"
-            required
-            className="w-full border-b border-charcoal/20 bg-transparent py-3 text-charcoal outline-none focus:border-gold"
-          />
+          <input id="name" name="name" required className={fieldClass} />
         </div>
         <div>
           <label
@@ -98,7 +101,7 @@ export function InquiryForm() {
             name="email"
             type="email"
             required
-            className="w-full border-b border-charcoal/20 bg-transparent py-3 text-charcoal outline-none focus:border-gold"
+            className={fieldClass}
           />
         </div>
       </div>
@@ -111,11 +114,7 @@ export function InquiryForm() {
           >
             Country
           </label>
-          <input
-            id="country"
-            name="country"
-            className="w-full border-b border-charcoal/20 bg-transparent py-3 text-charcoal outline-none focus:border-gold"
-          />
+          <input id="country" name="country" className={fieldClass} />
         </div>
         <div>
           <label
@@ -129,7 +128,7 @@ export function InquiryForm() {
             name="inquiryType"
             defaultValue={defaultType}
             required
-            className="w-full border-b border-charcoal/20 bg-transparent py-3 text-charcoal outline-none focus:border-gold"
+            className={fieldClass}
           >
             <option value="general">General inquiry</option>
             <option value="specific-work">Specific work</option>
@@ -150,13 +149,13 @@ export function InquiryForm() {
           name="message"
           required
           rows={6}
-          className="w-full resize-none border border-charcoal/20 bg-transparent p-4 text-charcoal outline-none focus:border-gold"
+          className={textareaClass}
         />
       </div>
 
       {result && (
         <p
-          className={`text-sm ${result.success ? "text-gold-muted" : "text-red-700"}`}
+          className={`text-sm transition-opacity duration-500 ${result.success ? "text-gold-muted" : "text-red-700"}`}
         >
           {result.message}
         </p>
@@ -165,7 +164,7 @@ export function InquiryForm() {
       <button
         type="submit"
         disabled={isPending}
-        className="border border-gold/50 px-10 py-4 text-[11px] uppercase tracking-[0.25em] text-gold transition-colors hover:bg-gold hover:text-ink disabled:opacity-50"
+        className="border border-gold/50 px-10 py-4 text-[11px] uppercase tracking-[0.25em] text-gold transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] hover:border-gold hover:bg-gold hover:text-ink hover:shadow-[0_8px_32px_rgba(201,169,98,0.25)] active:scale-[0.98] disabled:opacity-50"
       >
         {isPending ? "Sending…" : "Send inquiry"}
       </button>

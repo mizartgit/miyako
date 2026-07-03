@@ -29,6 +29,10 @@ export function getFeaturedWorks(): Work[] {
   return works.filter((w) => w.featured);
 }
 
+export function getPrimaryFeaturedWork(): Work | undefined {
+  return works.find((w) => w.featured);
+}
+
 export function getArtistForWork(work: Work): Artist | undefined {
   return getArtistBySlug(work.artistSlug);
 }

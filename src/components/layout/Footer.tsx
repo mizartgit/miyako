@@ -9,9 +9,8 @@ export function Footer() {
             <p className="font-serif text-2xl tracking-[0.35em] text-gold">
               MIYAKO
             </p>
-            <p className="mt-4 max-w-xs text-sm leading-relaxed">
-              A curated platform introducing exceptional traditional artisans
-              from across Asia to a global audience.
+            <p className="mt-4 max-w-xs text-sm leading-relaxed text-stone/50">
+              A curated home for traditional craftsmanship
             </p>
           </div>
 

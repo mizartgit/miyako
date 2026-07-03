@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
 import { InquiryForm } from "@/components/contact/InquiryForm";
+import { Reveal } from "@/components/ui/Reveal";
 
 export const metadata: Metadata = {
   title: "Contact",
@@ -19,22 +20,28 @@ export default function ContactPage() {
     <div className="bg-stone pt-[var(--header-height)]">
       <section className="px-6 py-20 md:py-28">
         <div className="mx-auto max-w-2xl">
-          <p className="text-[10px] uppercase tracking-[0.35em] text-gold-muted">
-            Contact
-          </p>
-          <h1 className="mt-6 font-serif text-4xl text-charcoal md:text-5xl">
-            Begin a conversation
-          </h1>
-          <p className="mt-6 text-sm leading-relaxed text-charcoal/70 md:text-base">
-            Each piece is made to order or uniquely one-of-a-kind. We connect
-            you directly with the artist. Shipping is handled by the artisan.
-          </p>
+          <Reveal>
+            <p className="text-[10px] uppercase tracking-[0.35em] text-gold-muted">
+              Contact
+            </p>
+            <h1 className="mt-6 font-serif text-4xl text-charcoal md:text-5xl">
+              Begin a conversation
+            </h1>
+          </Reveal>
+          <Reveal delay={100}>
+            <p className="mt-6 text-sm leading-relaxed text-charcoal/70 md:text-base">
+              Each piece is made to order or uniquely one-of-a-kind. Shipping is
+              handled by the artisan.
+            </p>
+          </Reveal>
 
-          <div className="mt-12">
-            <Suspense fallback={<InquiryFormFallback />}>
-              <InquiryForm />
-            </Suspense>
-          </div>
+          <Reveal delay={200}>
+            <div className="mt-12">
+              <Suspense fallback={<InquiryFormFallback />}>
+                <InquiryForm />
+              </Suspense>
+            </div>
+          </Reveal>
         </div>
       </section>
     </div>

@@ -1,50 +1,65 @@
 import Image from "next/image";
 import Link from "next/link";
-import { getArtistForWork, getFeaturedWorks } from "@/lib/content";
+import { Reveal } from "@/components/ui/Reveal";
+import { getArtistForWork, getPrimaryFeaturedWork } from "@/lib/content";
 
 export function FeaturedWorks() {
-  const works = getFeaturedWorks();
+  const work = getPrimaryFeaturedWork();
+  if (!work) return null;
+
+  const artist = getArtistForWork(work);
 
   return (
     <section className="bg-stone px-6 py-24 md:py-32">
       <div className="mx-auto max-w-7xl">
-        <p className="text-[10px] uppercase tracking-[0.35em] text-gold-muted">
-          Selected Works
-        </p>
-        <h2 className="mt-4 font-serif text-4xl text-charcoal md:text-5xl">
-          Pieces of quiet mastery
-        </h2>
+        <Reveal>
+          <p className="text-[10px] uppercase tracking-[0.35em] text-gold-muted">
+            Selected Work
+          </p>
+        </Reveal>
 
-        <div className="mt-16 grid gap-8 sm:grid-cols-2 lg:grid-cols-4">
-          {works.map((work) => {
-            const artist = getArtistForWork(work);
-            return (
-              <Link
-                key={work.slug}
-                href={`/works/${work.slug}`}
-                className="group"
-              >
-                <div className="relative aspect-[3/4] overflow-hidden bg-ink/5">
-                  <Image
-                    src={work.images[0]}
-                    alt={work.title}
-                    fill
-                    className="object-cover transition-transform duration-700 group-hover:scale-105"
-                    sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
-                  />
-                </div>
-                <div className="mt-4">
-                  <p className="text-[10px] uppercase tracking-[0.25em] text-gold-muted">
-                    {artist?.name}
-                  </p>
-                  <p className="mt-1 font-serif text-xl text-charcoal group-hover:text-gold transition-colors">
-                    {work.title}
-                  </p>
-                </div>
-              </Link>
-            );
-          })}
-        </div>
+        <Reveal delay={100}>
+          <Link
+            href={`/works/${work.slug}`}
+            className="group mt-10 block"
+          >
+            <div className="image-zoom relative aspect-[16/10] overflow-hidden bg-ink/5 md:aspect-[2/1]">
+              <Image
+                src={work.images[0]}
+                alt={work.title}
+                fill
+                className="object-cover"
+                sizes="100vw"
+                priority
+              />
+            </div>
+          </Link>
+        </Reveal>
+
+        <Reveal delay={180}>
+          <div className="mt-8 max-w-xl">
+            {artist && (
+              <p className="text-[10px] uppercase tracking-[0.25em] text-gold-muted">
+                {artist.name}
+              </p>
+            )}
+            <Link
+              href={`/works/${work.slug}`}
+              className="mt-2 inline-block font-serif text-2xl text-charcoal transition-colors duration-500 hover:text-gold md:text-3xl"
+            >
+              {work.title}
+            </Link>
+            <p className="mt-4 text-sm leading-relaxed text-charcoal/70 md:text-base">
+              {work.story}
+            </p>
+            <Link
+              href={`/works/${work.slug}`}
+              className="link-underline mt-6 inline-block text-[11px] uppercase tracking-[0.25em] text-gold-muted transition-colors duration-500 hover:text-gold"
+            >
+              View piece
+            </Link>
+          </div>
+        </Reveal>
       </div>
     </section>
   );

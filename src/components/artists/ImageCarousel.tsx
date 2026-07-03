@@ -32,7 +32,7 @@ export function ImageCarousel({ images, alt, paused = false }: ImageCarouselProp
 
     const timer = setInterval(() => {
       setIndex((i) => (i + 1) % images.length);
-    }, 4000);
+    }, 4500);
 
     return () => clearInterval(timer);
   }, [images.length, paused, reducedMotion]);
@@ -47,7 +47,7 @@ export function ImageCarousel({ images, alt, paused = false }: ImageCarouselProp
           src={src}
           alt={alt}
           fill
-          className={`object-cover transition-opacity duration-1000 ${
+          className={`object-cover transition-opacity duration-[1200ms] ease-[cubic-bezier(0.16,1,0.3,1)] ${
             i === index ? "opacity-100" : "opacity-0"
           }`}
           sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"

@@ -21,14 +21,14 @@ export const metadata: Metadata = {
     template: "%s · MIYAKO",
   },
   description:
-    "A curated platform introducing exceptional traditional artisans from Japan and China to a global audience.",
+    "A curated home for traditional craftsmanship. Miyako preserves and celebrates exceptional independent artisans across Asia.",
   icons: {
     icon: "/favicon.svg",
   },
   openGraph: {
     title: "MIYAKO — Curated Traditional Craft",
     description:
-      "A digital museum introducing exceptional traditional artisans from across Asia.",
+      "A curated home for traditional craftsmanship from exceptional independent artisans across Asia.",
     type: "website",
   },
 };

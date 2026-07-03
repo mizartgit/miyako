@@ -1,6 +1,6 @@
 # MIYAKO
 
-A curated platform introducing exceptional traditional artisans from Japan and China to a global audience. Phase 1 is a content-driven marketing site with manual inquiry flow — no checkout.
+A curated home for traditional craftsmanship — a content-driven site introducing exceptional independent artisans across Asia, with manual inquiry flow (no checkout).
 
 ## Stack
 
