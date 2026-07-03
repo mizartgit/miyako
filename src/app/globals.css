@@ -1,0 +1,78 @@
+@import "tailwindcss";
+
+:root {
+  --ink: #0c0c0c;
+  --gold: #c9a962;
+  --gold-muted: #8a7344;
+  --stone: #f5f2ec;
+  --charcoal: #2a2826;
+  --background: var(--stone);
+  --foreground: var(--charcoal);
+  --header-height: 4.25rem;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-ink: var(--ink);
+  --color-gold: var(--gold);
+  --color-gold-muted: var(--gold-muted);
+  --color-stone: var(--stone);
+  --color-charcoal: var(--charcoal);
+  --font-serif: var(--font-cormorant);
+  --font-sans: var(--font-inter);
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-inter), system-ui, sans-serif;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(24px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in-up {
+  animation: fadeInUp 0.9s ease-out forwards;
+}
+
+@keyframes scrollCue {
+  0%,
+  100% {
+    opacity: 0.4;
+    transform: translateY(0);
+  }
+  50% {
+    opacity: 1;
+    transform: translateY(6px);
+  }
+}
+
+.animate-scroll-cue {
+  animation: scrollCue 2.4s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  .animate-fade-in-up,
+  .animate-scroll-cue {
+    animation: none;
+    opacity: 1;
+    transform: none;
+  }
+}

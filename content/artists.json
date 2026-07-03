@@ -1,0 +1,128 @@
+[
+  {
+    "slug": "koyo-kiln",
+    "name": "Kōyō Kiln",
+    "region": "Kyoto, Japan",
+    "craft": "Raku tea bowls",
+    "portrait": "https://images.unsplash.com/photo-1565193566173-7a0ee3dbe261?w=800&q=80",
+    "carouselImages": [
+      "https://images.unsplash.com/photo-1565193566173-7a0ee3dbe261?w=800&q=80",
+      "https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=800&q=80",
+      "https://images.unsplash.com/photo-1610701596007-115028617dc3?w=800&q=80",
+      "https://images.unsplash.com/photo-1617032219428-0f2f41b4e8b5?w=800&q=80"
+    ],
+    "introShort": "Fourth-generation raku master in Kyoto. Each tea bowl is fired once, unglazed, and never repeated.",
+    "introFull": "Kōyō Kiln has practiced the way of raku chawan for over a century in the hills above Kyoto. The current master, Hiroshi Nakamura, trained under his father and grandfather before establishing his own kiln in 1998. Every bowl is hand-thrown, bisque-fired, and then pulled from a glowing kiln at 1,000°C to be cooled in ash and water — a process that yields surfaces no two artisans can replicate.\n\nNakamura-san works exclusively for tea ceremony practitioners and collectors who understand that a bowl is not merely a vessel, but a conversation between maker, host, and guest. His work has been exhibited at the Kyoto National Museum and acquired by private collections across Europe and North America.",
+    "pullQuote": "The bowl finds its form in the fire, not on the wheel.",
+    "yearsOfPractice": "Est. 1923 · 4th generation",
+    "workSlugs": ["moonlit-chawan", "winter-ash-bowl", "golden-raku-cup"]
+  },
+  {
+    "slug": "atelier-ming",
+    "name": "Atelier Ming",
+    "region": "Jingdezhen, China",
+    "craft": "Blue-and-white porcelain",
+    "portrait": "https://images.unsplash.com/photo-1610701596007-115028617dc3?w=800&q=80",
+    "carouselImages": [
+      "https://images.unsplash.com/photo-1610701596007-115028617dc3?w=800&q=80",
+      "https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=800&q=80",
+      "https://images.unsplash.com/photo-1578749556568-bc2c40e68b24?w=800&q=80",
+      "https://images.unsplash.com/photo-1615529328331-f8917597711f?w=800&q=80"
+    ],
+    "introShort": "Reviving Ming-era cobalt techniques in the porcelain capital of the world. Painted by hand, fired at 1,300°C.",
+    "introFull": "Atelier Ming operates from a restored workshop in the old ceramic district of Jingdezhen — a city that has produced imperial porcelain for over a thousand years. Founded by painter and ceramist Wei Lin in 2015, the atelier specializes in underglaze cobalt blue decoration using mineral pigments sourced from Yunnan province.\n\nEach piece is painted freehand onto leather-hard porcelain, then glazed and fired at temperatures exceeding 1,300°C. The result is a depth of colour and clarity of line that machine reproduction cannot approach. Atelier Ming produces limited editions of vases, plates, and tea vessels for collectors who value the continuity of a craft tradition that shaped global trade for centuries.",
+    "pullQuote": "Cobalt does not lie. Every stroke survives the fire.",
+    "yearsOfPractice": "Est. 2015 · Jingdezhen",
+    "workSlugs": ["cobalt-vase", "lotus-plate", "blue-scroll-teapot"]
+  },
+  {
+    "slug": "tanaka-togei",
+    "name": "Tanaka Tōgei",
+    "region": "Shigaraki, Japan",
+    "craft": "Wood-fired vessels",
+    "portrait": "https://images.unsplash.com/photo-1565193566173-7a0ee3dbe261?w=800&q=80",
+    "carouselImages": [
+      "https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=800&q=80",
+      "https://images.unsplash.com/photo-1615529328331-f8917597711f?w=800&q=80",
+      "https://images.unsplash.com/photo-1610701596007-115028617dc3?w=800&q=80",
+      "https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=800&q=80"
+    ],
+    "introShort": "Anagama kiln firings in Shigaraki. Natural ash glazes, rough stoneware, vessels shaped by flame.",
+    "introFull": "Tanaka Tōgei is a family workshop in Shigaraki, one of Japan's six ancient kiln sites. For three generations, the Tanaka family has fired stoneware in a traditional anagama — a single-chamber tunnel kiln built into a hillside, fueled by pine for days at a time.\n\nThe natural ash that settles on each piece during firing creates unpredictable, luminous surfaces. No two vessels emerge alike. Master potter Kenji Tanaka accepts commissions for tableware, flower vases, and sculptural forms, always insisting that the kiln, not the potter, makes the final decision.",
+    "pullQuote": "We build the kiln. The fire completes the work.",
+    "yearsOfPractice": "Est. 1962 · 3rd generation",
+    "workSlugs": ["shigaraki-jar", "ash-glaze-bowl", "flame-vessel"]
+  },
+  {
+    "slug": "suzhou-silk-atelier",
+    "name": "Suzhou Silk Atelier",
+    "region": "Suzhou, China",
+    "craft": "Embroidery panels",
+    "portrait": "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=800&q=80",
+    "carouselImages": [
+      "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=800&q=80",
+      "https://images.unsplash.com/photo-1528164344705-47542687000d?w=800&q=80",
+      "https://images.unsplash.com/photo-1506806732259-39c2d0268443?w=800&q=80",
+      "https://images.unsplash.com/photo-1610701596007-115028617dc3?w=800&q=80"
+    ],
+    "introShort": "Double-sided silk embroidery from Suzhou. A single panel may require ten thousand stitches and six months of work.",
+    "introFull": "Suzhou Silk Atelier preserves the Su embroidery tradition — one of China's four great embroidery styles — in a studio overlooking the canals of the old city. Master embroiderer Mei Chen leads a small team of artisans who work exclusively on silk gauze using filament threads split to one-sixteenth their original width.\n\nEach panel is designed in collaboration with the client or curator, often depicting landscapes, birds, or classical motifs drawn from Song dynasty painting. The atelier accepts no more than twelve commissions per year, ensuring that every piece receives the unhurried attention this art form demands.",
+    "pullQuote": "Silk remembers every stitch. There is no undoing.",
+    "yearsOfPractice": "Est. 2008 · Suzhou",
+    "workSlugs": ["crane-panel", "landscape-silk"]
+  },
+  {
+    "slug": "hagi-yaki-workshop",
+    "name": "Hagi Yaki Workshop",
+    "region": "Yamaguchi, Japan",
+    "craft": "Hagi ware",
+    "portrait": "https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=800&q=80",
+    "carouselImages": [
+      "https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=800&q=80",
+      "https://images.unsplash.com/photo-1617032219428-0f2f41b4e8b5?w=800&q=80",
+      "https://images.unsplash.com/photo-1565193566173-7a0ee3dbe261?w=800&q=80",
+      "https://images.unsplash.com/photo-1610701596007-115028617dc3?w=800&q=80"
+    ],
+    "introShort": "Soft, porous Hagi clay that changes colour with use. Tea stains the bowl; the bowl becomes yours alone.",
+    "introFull": "Hagi Yaki Workshop continues a four-hundred-year tradition from Yamaguchi Prefecture in western Japan. Hagi ware is prized for its soft, warm glaze and porous clay body that gradually absorbs the tannins of tea, deepening in colour over years of use — a phenomenon collectors call \"the seven changes.\"\n\nWorkshop director Yuki Mori produces chawan, yunomi, and mizusashi for tea practitioners worldwide. Each piece is formed on a kick wheel, glazed in white or biwa (loquat) tones, and fired in a climbing kiln shared with two neighbouring families.",
+    "pullQuote": "A Hagi bowl is never finished. You complete it through use.",
+    "yearsOfPractice": "Est. 1890 · 5th generation",
+    "workSlugs": ["hagi-chawan", "biwa-yunomi"]
+  },
+  {
+    "slug": "longquan-celadon",
+    "name": "Longquan Celadon",
+    "region": "Zhejiang, China",
+    "craft": "Celadon vases",
+    "portrait": "https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=800&q=80",
+    "carouselImages": [
+      "https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=800&q=80",
+      "https://images.unsplash.com/photo-1578749556568-bc2c40e68b24?w=800&q=80",
+      "https://images.unsplash.com/photo-1615529328331-f8917597711f?w=800&q=80",
+      "https://images.unsplash.com/photo-1610701596007-115028617dc3?w=800&q=80"
+    ],
+    "introShort": "Song dynasty celadon glazes recreated in Longquan. Jade-green surfaces achieved through iron oxide and reduction firing.",
+    "introFull": "Longquan Celadon is named for the kiln town in Zhejiang province that supplied the Song and Yuan courts with jade-green glazed ware. Master ceramist Zhao Wei spent fifteen years studying historical shards before reopening a small kiln in 2010.\n\nHis celadon vases, bowls, and incense burners use locally mined porcelain stone and a glaze recipe derived from Song-era records. The distinctive colour — sometimes called \"secret colour\" — emerges only in a carefully controlled reduction atmosphere at peak firing temperature.",
+    "pullQuote": "The green is not painted. It is born in the kiln.",
+    "yearsOfPractice": "Est. 2010 · Longquan",
+    "workSlugs": ["jade-vase", "celadon-bowl"]
+  },
+  {
+    "slug": "nishijin-textiles",
+    "name": "Nishijin Textiles",
+    "region": "Kyoto, Japan",
+    "craft": "Brocade & embroidery",
+    "portrait": "https://images.unsplash.com/photo-1528164344705-47542687000d?w=800&q=80",
+    "carouselImages": [
+      "https://images.unsplash.com/photo-1528164344705-47542687000d?w=800&q=80",
+      "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=800&q=80",
+      "https://images.unsplash.com/photo-1506806732259-39c2d0268443?w=800&q=80",
+      "https://images.unsplash.com/photo-1610701596007-115028617dc3?w=800&q=80"
+    ],
+    "introShort": "Nishijin-ori brocade weaving in Kyoto. Gold and silk threads woven on hand-operated looms since the Heian period.",
+    "introFull": "Nishijin Textiles operates from a narrow workshop in Kyoto's Nishijin district, where brocade weaving has continued uninterrupted for over a thousand years. The atelier, led by fourth-generation weaver Akiko Sato, produces obi panels, wall hangings, and framed textile art using traditional Jacquard looms and gold-leaf threads.\n\nEach piece requires weeks of preparation — dyeing silk, winding bobbins, and programming the loom pattern by hand. Sato-san works with a single assistant and accepts only bespoke commissions, often collaborating with contemporary artists who seek to bridge classical technique and modern expression.",
+    "pullQuote": "The loom remembers every pattern woven before us.",
+    "yearsOfPractice": "Est. 1934 · 4th generation",
+    "workSlugs": ["gold-brocade-panel", "crane-obi-art", "silk-wall-hanging"]
+  }
+]
