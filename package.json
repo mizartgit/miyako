@@ -10,7 +10,8 @@
     "dev": "npm run dev -w frontend",
     "dev:frontend": "npm run dev -w frontend",
     "dev:backend": "npm run dev --prefix backend",
-    "build": "npm run build --prefix backend && npm run build -w frontend",
+    "build": "npm run build -w frontend",
+    "build:all": "npm run build:backend && npm run build -w frontend",
     "build:backend": "npm run build --prefix backend",
     "lint": "npm run lint -w frontend",
     "db:push": "npm run db:push -w frontend"

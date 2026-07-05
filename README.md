@@ -86,6 +86,24 @@ Open:
 
 ---
 
+## Deploying to Vercel (frontend only)
+
+Vercel hosts the **Next.js gallery**. The Medusa backend is a separate service (Railway, Render, Medusa Cloud, etc.) — it is **not** built on Vercel.
+
+In your Vercel project settings:
+
+| Setting | Value |
+|---------|--------|
+| **Root Directory** | `frontend` |
+| **Install Command** | `npm ci` (runs at monorepo root automatically) |
+| **Build Command** | `npm run build` (default from `frontend/package.json`) |
+
+If the Root Directory is left at the repo root, `vercel.json` still runs `npm run build -w frontend` so the Medusa backend is never invoked.
+
+The backend requires a standalone install (`cd backend && npm install`) before `npm run build:backend` — that only runs locally via `npm run build:all`.
+
+---
+
 ## Architecture
 
 ```mermaid
@@ -157,7 +175,8 @@ When creating a product in Medusa Admin, set:
 |---------|-------------|
 | `npm run dev` | Start Next.js frontend (3003) |
 | `npm run dev:backend` | Start Medusa backend (9000) |
-| `npm run build` | Build backend + frontend |
+| `npm run build` | Build frontend (Vercel / production gallery) |
+| `npm run build:all` | Build backend + frontend (local full stack) |
 | `npm run db:push` | Push Prisma schema (frontend DB) |
 
 ---
