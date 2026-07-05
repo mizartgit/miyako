@@ -1,0 +1,222 @@
+[
+  {
+    "slug": "moonlit-chawan",
+    "artistSlug": "koyo-kiln",
+    "title": "Moonlit Chawan",
+    "titleJa": "月影茶碗",
+    "material": "Raku stoneware",
+    "dimensions": "12 × 12 cm",
+    "story": "Thrown and fired in a single autumn session. The surface bears the trace of pine ash and the crackle of rapid cooling — a bowl meant for winter tea gatherings.",
+    "storyJa": "秋の窯焚きで生まれた一碗。松灰が織りなす自然な景色と、急冷による繊細な貫入が、冬の茶席に静かな趣を添えます。",
+    "images": [
+      "https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=1200&q=80",
+      "https://images.unsplash.com/photo-1617032219428-0f2f41b4e8b5?w=1200&q=80"
+    ],
+    "featured": true,
+    "medusaHandle": "moonlit-chawan",
+    "priceJpy": 185000,
+    "available": true,
+    "technique": "Raku firing",
+    "region": "Kyoto, Japan",
+    "careInstructions": "Hand wash only. Avoid direct sunlight and sudden temperature changes."
+  },
+  {
+    "slug": "winter-ash-bowl",
+    "artistSlug": "koyo-kiln",
+    "title": "Winter Ash Bowl",
+    "material": "Raku stoneware",
+    "dimensions": "11 × 10 cm",
+    "story": "Named for the grey-white ash glaze that settled during firing. Used in Nakamura-san's own tea room before being offered for acquisition.",
+    "images": [
+      "https://images.unsplash.com/photo-1610701596007-115028617dc3?w=1200&q=80"
+    ]
+  },
+  {
+    "slug": "golden-raku-cup",
+    "artistSlug": "koyo-kiln",
+    "title": "Golden Raku Cup",
+    "material": "Raku stoneware with gold repair",
+    "dimensions": "8 × 7 cm",
+    "story": "A small yunomi with kintsugi gold repair along one edge — a deliberate embrace of imperfection.",
+    "images": [
+      "https://images.unsplash.com/photo-1565193566173-7a0ee3dbe261?w=1200&q=80"
+    ]
+  },
+  {
+    "slug": "cobalt-vase",
+    "artistSlug": "atelier-ming",
+    "title": "Cobalt Scroll Vase",
+    "material": "Jingdezhen porcelain",
+    "dimensions": "28 × 14 cm",
+    "story": "Hand-painted with scrolling vine motifs in Yunnan cobalt. Fired at 1,320°C for a depth of blue that shifts with the light.",
+    "images": [
+      "https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=1200&q=80",
+      "https://images.unsplash.com/photo-1578749556568-bc2c40e68b24?w=1200&q=80"
+    ],
+    "featured": true,
+    "medusaHandle": "cobalt-scroll-vase",
+    "priceJpy": 420000,
+    "available": true,
+    "technique": "Underglaze cobalt painting",
+    "region": "Jingdezhen, China",
+    "careInstructions": "Display away from high-traffic areas. Dust with a soft, dry cloth."
+  },
+  {
+    "slug": "lotus-plate",
+    "artistSlug": "atelier-ming",
+    "title": "Lotus Plate",
+    "material": "Jingdezhen porcelain",
+    "dimensions": "32 cm diameter",
+    "story": "A display plate painted with lotus blossoms and herons, inspired by Ming dynasty export ware.",
+    "images": [
+      "https://images.unsplash.com/photo-1615529328331-f8917597711f?w=1200&q=80"
+    ]
+  },
+  {
+    "slug": "blue-scroll-teapot",
+    "artistSlug": "atelier-ming",
+    "title": "Blue Scroll Teapot",
+    "material": "Jingdezhen porcelain",
+    "dimensions": "14 × 10 cm",
+    "story": "A functional teapot with underglaze blue landscape decoration. The spout pours without dripping — a test Wei Lin applies to every piece.",
+    "images": [
+      "https://images.unsplash.com/photo-1610701596007-115028617dc3?w=1200&q=80"
+    ]
+  },
+  {
+    "slug": "shigaraki-jar",
+    "artistSlug": "tanaka-togei",
+    "title": "Shigaraki Storage Jar",
+    "material": "Shigaraki stoneware",
+    "dimensions": "35 × 28 cm",
+    "story": "A large tsubo jar fired for five days in the anagama. Natural ash created a gradient from charcoal grey to warm orange.",
+    "images": [
+      "https://images.unsplash.com/photo-1615529328331-f8917597711f?w=1200&q=80"
+    ],
+    "featured": true
+  },
+  {
+    "slug": "ash-glaze-bowl",
+    "artistSlug": "tanaka-togei",
+    "title": "Ash Glaze Bowl",
+    "material": "Shigaraki stoneware",
+    "dimensions": "18 × 8 cm",
+    "story": "A serving bowl with thick natural ash glaze pooling in the interior. Intended for seasonal kaiseki presentations.",
+    "images": [
+      "https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=1200&q=80"
+    ]
+  },
+  {
+    "slug": "flame-vessel",
+    "artistSlug": "tanaka-togei",
+    "title": "Flame Vessel",
+    "material": "Shigaraki stoneware",
+    "dimensions": "22 × 15 cm",
+    "story": "Sculptural form inspired by the flame patterns left on kiln shelves. One of a series of twelve.",
+    "images": [
+      "https://images.unsplash.com/photo-1565193566173-7a0ee3dbe261?w=1200&q=80"
+    ]
+  },
+  {
+    "slug": "crane-panel",
+    "artistSlug": "suzhou-silk-atelier",
+    "title": "Crane & Pine Panel",
+    "material": "Silk gauze, filament thread",
+    "dimensions": "45 × 60 cm framed",
+    "story": "Double-sided embroidery depicting cranes among ancient pines. Over 12,000 individual stitches on natural silk gauze.",
+    "images": [
+      "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=1200&q=80",
+      "https://images.unsplash.com/photo-1528164344705-47542687000d?w=1200&q=80"
+    ],
+    "featured": true
+  },
+  {
+    "slug": "landscape-silk",
+    "artistSlug": "suzhou-silk-atelier",
+    "title": "Misty Landscape",
+    "material": "Silk gauze, filament thread",
+    "dimensions": "50 × 70 cm framed",
+    "story": "A Song-inspired landscape rendered in graduated silk tones. Commissioned for a private collection in London.",
+    "images": [
+      "https://images.unsplash.com/photo-1506806732259-39c2d0268443?w=1200&q=80"
+    ]
+  },
+  {
+    "slug": "hagi-chawan",
+    "artistSlug": "hagi-yaki-workshop",
+    "title": "Hagi Tea Bowl",
+    "material": "Hagi clay, white glaze",
+    "dimensions": "12 × 11 cm",
+    "story": "A classic Hagi chawan with soft white glaze. The clay body will deepen with tea use over years of ceremony.",
+    "images": [
+      "https://images.unsplash.com/photo-1617032219428-0f2f41b4e8b5?w=1200&q=80"
+    ]
+  },
+  {
+    "slug": "biwa-yunomi",
+    "artistSlug": "hagi-yaki-workshop",
+    "title": "Biwa Yunomi",
+    "material": "Hagi clay, biwa glaze",
+    "dimensions": "9 × 8 cm",
+    "story": "A daily tea cup in the warm loquat-toned glaze unique to Hagi ware. Comfortable in the hand, subtle in the mouth.",
+    "images": [
+      "https://images.unsplash.com/photo-1578662996442-48f60103fc96?w=1200&q=80"
+    ]
+  },
+  {
+    "slug": "jade-vase",
+    "artistSlug": "longquan-celadon",
+    "title": "Jade Gu Vase",
+    "material": "Longquan porcelain, celadon glaze",
+    "dimensions": "30 × 18 cm",
+    "story": "A gu-form vase with the characteristic Longquan jade-green glaze. Reduction-fired to achieve the \"secret colour.\"",
+    "images": [
+      "https://images.unsplash.com/photo-1578749556568-bc2c40e68b24?w=1200&q=80"
+    ],
+    "featured": true
+  },
+  {
+    "slug": "celadon-bowl",
+    "artistSlug": "longquan-celadon",
+    "title": "Celadon Bowl",
+    "material": "Longquan porcelain, celadon glaze",
+    "dimensions": "16 × 7 cm",
+    "story": "A simple bowl form that showcases the depth of the celadon glaze. The interior catches light like still water.",
+    "images": [
+      "https://images.unsplash.com/photo-1586023492125-27b2c045efd7?w=1200&q=80"
+    ]
+  },
+  {
+    "slug": "gold-brocade-panel",
+    "artistSlug": "nishijin-textiles",
+    "title": "Gold Brocade Panel",
+    "material": "Silk, gold-leaf thread",
+    "dimensions": "40 × 90 cm framed",
+    "story": "A Nishijin-ori panel woven with gold-leaf threads on a deep indigo ground. Traditional peony motif reinterpreted at reduced scale.",
+    "images": [
+      "https://images.unsplash.com/photo-1528164344705-47542687000d?w=1200&q=80"
+    ]
+  },
+  {
+    "slug": "crane-obi-art",
+    "artistSlug": "nishijin-textiles",
+    "title": "Crane Obi Art",
+    "material": "Silk brocade",
+    "dimensions": "35 × 120 cm framed",
+    "story": "A section of obi brocade featuring flying cranes, framed as wall art. Woven on a hand-operated Jacquard loom.",
+    "images": [
+      "https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=1200&q=80"
+    ]
+  },
+  {
+    "slug": "silk-wall-hanging",
+    "artistSlug": "nishijin-textiles",
+    "title": "Silk Wall Hanging",
+    "material": "Silk brocade with embroidery",
+    "dimensions": "50 × 80 cm",
+    "story": "A contemporary wall hanging combining Nishijin brocade with hand-embroidered accents. Created in collaboration with a Kyoto painter.",
+    "images": [
+      "https://images.unsplash.com/photo-1506806732259-39c2d0268443?w=1200&q=80"
+    ]
+  }
+]

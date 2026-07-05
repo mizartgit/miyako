@@ -1,57 +1,174 @@
 # MIYAKO
 
-A curated home for traditional craftsmanship — a content-driven site introducing exceptional independent artisans across Asia, with manual inquiry flow (no checkout).
+A premium platform dedicated to preserving traditional craftsmanship across Asia.
 
-## Stack
+This is a **monorepo** with a strict separation between presentation and commerce:
 
-- Next.js 16 (App Router)
-- Tailwind CSS 4
-- TypeScript
-- Static JSON content
+```
+miyako/
+├── frontend/     Next.js gallery + accounts (your website — unchanged design)
+├── backend/      Medusa commerce API + admin (products, orders, inventory)
+└── shared/       TypeScript types shared between frontend and backend
+```
 
-## Getting started
+The Next.js frontend is never replaced. It reads gallery content from `frontend/content/` and commerce data from the Medusa Store API.
+
+---
+
+## Prerequisites
+
+- **Node.js 20+**
+- **PostgreSQL** (Neon recommended)
+- **Redis** (optional for local dev; required for production Medusa workers)
+
+---
+
+## Quick start
+
+### 1. Install dependencies
 
 ```bash
+# Frontend + shared (from repo root)
 npm install
+
+# Medusa backend (standalone — do NOT use workspaces)
+cd backend && npm install && cd ..
+```
+
+### 2. Frontend environment
+
+```bash
+cp frontend/.env.example frontend/.env.local
+```
+
+Edit `frontend/.env.local`:
+
+| Variable | Purpose |
+|----------|---------|
+| `AUTH_SECRET` | NextAuth — `openssl rand -base64 32` |
+| `DATABASE_URL` | PostgreSQL for accounts, wishlist, order mirror |
+| `AUTH_URL` | `http://localhost:3003` |
+| `MEDUSA_BACKEND_URL` | `http://localhost:9000` |
+| `NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY` | From Medusa Admin (after backend setup) |
+
+Push the frontend database schema:
+
+```bash
+npm run db:push
+```
+
+### 3. Backend environment
+
+```bash
+cp backend/.env.template backend/.env
+```
+
+Edit `backend/.env` — see [backend/README.md](./backend/README.md) for every step.
+
+### 4. Run both services
+
+Terminal 1 — Medusa (port **9000**):
+
+```bash
+npm run dev:backend
+```
+
+Terminal 2 — Next.js (port **3003**):
+
+```bash
 npm run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000).
+Open:
 
-## Content
+- Gallery: [http://localhost:3003](http://localhost:3003)
+- Medusa Admin: [http://localhost:9000/app](http://localhost:9000/app)
 
-All content lives in the `content/` directory:
+---
 
-- `content/artists.json` — artist profiles, carousel images, bios
-- `content/works.json` — individual works linked to artists via `artistSlug`
+## Architecture
 
-To add an artist, append a record to `artists.json` with `workSlugs` referencing works in `works.json`.
+```mermaid
+flowchart LR
+  subgraph frontend [frontend/ Next.js]
+    pages[Pages + Components]
+    content[content/works.json]
+    prisma[Prisma — accounts, wishlist]
+    medusaClient[lib/commerce/medusa]
+  end
 
-## Contact form
+  subgraph backend [backend/ Medusa]
+    storeAPI[Store API]
+    admin[Admin Dashboard]
+    postgres[(PostgreSQL)]
+    stripe[Stripe — Phase 2]
+  end
 
-The inquiry form uses [Resend](https://resend.com) when `RESEND_API_KEY` is set in `.env.local`. Without it, submissions fall back to opening a `mailto:` link.
+  subgraph shared [shared/]
+    types[Work metadata types]
+  end
 
-Copy `.env.example` to `.env.local` and fill in your values:
-
-```bash
-cp .env.example .env.local
+  pages --> content
+  pages --> medusaClient
+  medusaClient --> storeAPI
+  admin --> postgres
+  storeAPI --> postgres
+  shared --> frontend
+  shared --> backend
 ```
 
-## Deploy
+| Layer | Location | Responsibility |
+|-------|----------|----------------|
+| **Presentation** | `frontend/` | Gallery UI, i18n, auth, wishlist |
+| **Commerce API** | `frontend/src/lib/commerce/medusa/` | Medusa Store API client |
+| **Commerce backend** | `backend/` | Products, carts, orders, inventory, admin (standalone npm install) |
+| **Shared contracts** | `shared/` | Work metadata schema, currency types, shipping carriers |
+| **Content** | `frontend/content/` | Artist/work storytelling (static JSON) |
+| **Accounts DB** | `frontend/prisma/` | Users, wishlist, order mirror |
 
-Deploy to [Vercel](https://vercel.com) with one click. Set environment variables in the Vercel dashboard if using Resend.
+---
 
-```bash
-npm run build
-```
+## Works vs Products
 
-## Pages
+Medusa internally uses **Products**. MIYAKO calls them **Works** on the website.
 
-| Route | Description |
-|-------|-------------|
-| `/` | Homepage with hero, mission excerpt, featured works |
-| `/mission` | Full mission and how-it-works |
-| `/artists` | Interactive artist grid with image carousels |
-| `/artists/[slug]` | Artist profile and works |
-| `/works/[slug]` | Work detail with inquiry CTA |
-| `/contact` | Manual inquiry form |
+- **Gallery storytelling** stays in `frontend/content/works.json`
+- **Commerce** (price, inventory, checkout) comes from Medusa
+- Each Medusa product carries **Work metadata** (bilingual titles, artist, technique, etc.) in `product.metadata` — see `shared/src/work-metadata.ts`
+
+When creating a product in Medusa Admin, set:
+
+- **Handle** = SEO slug (matches `works.json` slug)
+- **Metadata** = Work fields (titleJa, artistName, region, oneOfAKind, etc.)
+
+---
+
+## Payments & shipping (prepared)
+
+- **Stripe**: Architecture ready in `backend/medusa-config.ts`. Set `STRIPE_API_KEY` in Phase 2.
+- **Shipping**: EMS, DHL, FedEx, UPS stubs in `backend/src/modules/fulfillment/`. Live rates in Phase 2.
+- **Checkout**: Buy button creates a Medusa cart → `/checkout` page. Full payment UI in Phase 2.
+
+---
+
+## Scripts
+
+| Command | Description |
+|---------|-------------|
+| `npm run dev` | Start Next.js frontend (3003) |
+| `npm run dev:backend` | Start Medusa backend (9000) |
+| `npm run build` | Build backend + frontend |
+| `npm run db:push` | Push Prisma schema (frontend DB) |
+
+---
+
+## Documentation
+
+- [Backend setup (step-by-step)](./backend/README.md)
+- [Shared types](./shared/src/)
+
+---
+
+## Removed
+
+Shopify integration has been fully removed. Commerce now flows through Medusa only.

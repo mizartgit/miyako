@@ -1,0 +1,10 @@
+node_modules/
+.medusa/
+uploads/
+static/
+.cache/
+.env
+.env.*
+!.env.template
+dist/
+*.log
