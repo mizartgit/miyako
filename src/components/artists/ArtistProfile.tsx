@@ -1,6 +1,8 @@
 import Image from "next/image";
-import Link from "next/link";
+import { getTranslations } from "next-intl/server";
+import { Link } from "@/i18n/navigation";
 import { Reveal } from "@/components/ui/Reveal";
+import { DualTitle } from "@/components/ui/DualTitle";
 import { InquiryButton } from "@/components/work/InquiryButton";
 import type { Artist, Work } from "@/lib/types";
 
@@ -9,13 +11,15 @@ type ArtistProfileProps = {
   works: Work[];
 };
 
-export function ArtistProfile({ artist, works }: ArtistProfileProps) {
+export async function ArtistProfile({ artist, works }: ArtistProfileProps) {
+  const t = await getTranslations("artists");
+
   return (
     <article>
       <section className="relative flex min-h-[60vh] items-end overflow-hidden">
         <Image
           src={artist.portrait}
-          alt={artist.name}
+          alt={artist.nameJa ?? artist.name}
           fill
           priority
           className="object-cover"
@@ -29,7 +33,7 @@ export function ArtistProfile({ artist, works }: ArtistProfileProps) {
                 {artist.craft} · {artist.region}
               </p>
               <h1 className="mt-4 font-serif text-5xl text-gold md:text-7xl">
-                {artist.name}
+                <DualTitle nameJa={artist.nameJa} nameEn={artist.name} />
               </h1>
               {artist.yearsOfPractice && (
                 <p className="mt-4 text-sm text-stone/60">
@@ -64,24 +68,21 @@ export function ArtistProfile({ artist, works }: ArtistProfileProps) {
         <div className="mx-auto max-w-7xl">
           <Reveal>
             <p className="text-[10px] uppercase tracking-[0.35em] text-gold-muted">
-              Works
+              {t("worksLabel")}
             </p>
             <h2 className="mt-4 font-serif text-3xl text-gold md:text-4xl">
-              By {artist.name}
+              <DualTitle nameJa={artist.nameJa} nameEn={artist.name} />
             </h2>
           </Reveal>
 
           <div className="mt-12 grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
             {works.map((work, i) => (
               <Reveal key={work.slug} delay={i * 90} variant="scale">
-                <Link
-                  href={`/works/${work.slug}`}
-                  className="group block"
-                >
+                <Link href={`/works/${work.slug}`} className="group block">
                   <div className="image-zoom relative aspect-[3/4] overflow-hidden">
                     <Image
                       src={work.images[0]}
-                      alt={work.title}
+                      alt={work.titleJa ?? work.title}
                       fill
                       className="object-cover"
                       sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
@@ -89,7 +90,11 @@ export function ArtistProfile({ artist, works }: ArtistProfileProps) {
                   </div>
                   <div className="mt-4 transition-transform duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] group-hover:translate-x-1">
                     <p className="font-serif text-xl text-stone transition-colors duration-500 group-hover:text-gold">
-                      {work.title}
+                      <DualTitle
+                        nameJa={work.titleJa}
+                        nameEn={work.title}
+                        subClassName="mt-0.5 block text-sm font-normal opacity-70"
+                      />
                     </p>
                     <p className="mt-1 text-xs text-stone/50">{work.material}</p>
                   </div>
@@ -102,7 +107,7 @@ export function ArtistProfile({ artist, works }: ArtistProfileProps) {
             <div className="mt-16 flex justify-center">
               <InquiryButton
                 href={`/contact?artist=${artist.slug}`}
-                label="Inquire about this artist"
+                label={t("inquireAboutArtist")}
               />
             </div>
           </Reveal>

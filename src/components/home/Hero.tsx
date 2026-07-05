@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import { useTranslations } from "next-intl";
 import { useEffect, useState, useSyncExternalStore } from "react";
 
 function getReducedMotion() {
@@ -14,6 +15,7 @@ function subscribeReducedMotion(onStoreChange: () => void) {
 }
 
 export function Hero() {
+  const t = useTranslations("home");
   const [scrollY, setScrollY] = useState(0);
   const reducedMotion = useSyncExternalStore(
     subscribeReducedMotion,
@@ -70,7 +72,7 @@ export function Hero() {
         style={{ opacity: fade * 0.8 }}
       >
         <p className="animate-scroll-cue text-[10px] uppercase tracking-[0.35em] text-gold/60">
-          Scroll
+          {t("heroScroll")}
         </p>
       </div>
     </section>

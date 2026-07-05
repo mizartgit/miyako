@@ -1,9 +1,10 @@
 "use client";
 
-import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { useCallback, useState } from "react";
 import type { Artist } from "@/lib/types";
+import { Link, useRouter } from "@/i18n/navigation";
+import { DualTitle } from "@/components/ui/DualTitle";
 import { ImageCarousel } from "./ImageCarousel";
 
 type ArtistCardProps = {
@@ -11,6 +12,7 @@ type ArtistCardProps = {
 };
 
 export function ArtistCard({ artist }: ArtistCardProps) {
+  const t = useTranslations("artists");
   const router = useRouter();
   const [hovered, setHovered] = useState(false);
   const [expanded, setExpanded] = useState(false);
@@ -74,7 +76,11 @@ export function ArtistCard({ artist }: ArtistCardProps) {
                 : ""
             }`}
           >
-            {artist.name}
+            <DualTitle
+              nameJa={artist.nameJa}
+              nameEn={artist.name}
+              subClassName="mt-1 block text-base font-normal no-underline opacity-80"
+            />
           </h2>
 
           <div
@@ -93,7 +99,7 @@ export function ArtistCard({ artist }: ArtistCardProps) {
                 className="link-underline mt-4 inline-block text-[10px] uppercase tracking-[0.25em] text-gold transition-colors duration-500 hover:text-stone"
                 onClick={(e) => e.stopPropagation()}
               >
-                View profile
+                {t("viewProfile")}
               </Link>
             </div>
           </div>

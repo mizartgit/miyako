@@ -1,8 +1,9 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { useSearchParams } from "next/navigation";
 import { useState, useTransition } from "react";
-import { submitInquiry } from "@/app/contact/actions";
+import { submitInquiry } from "@/lib/actions/inquiry";
 import type { InquiryType } from "@/lib/types";
 
 const fieldClass =
@@ -12,6 +13,7 @@ const textareaClass =
   "w-full resize-none border border-charcoal/20 bg-transparent p-4 text-charcoal outline-none transition-[border-color,box-shadow] duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] focus:border-gold focus:shadow-[0_0_0_1px_var(--gold)]";
 
 export function InquiryForm() {
+  const t = useTranslations("contact");
   const searchParams = useSearchParams();
   const workSlug = searchParams.get("work") ?? undefined;
   const artistSlug = searchParams.get("artist") ?? undefined;
@@ -56,8 +58,7 @@ export function InquiryForm() {
         }
         setResult({
           success: true,
-          message:
-            "Thank you. We will respond within 48 hours with next steps.",
+          message: t("successMessage"),
         });
         form.reset();
       } else {
@@ -71,10 +72,18 @@ export function InquiryForm() {
       {(workSlug || artistSlug) && (
         <div className="border border-gold/20 bg-gold/5 px-4 py-3 text-sm text-charcoal/70 transition-opacity duration-500">
           {workSlug && (
-            <p>Inquiring about work: {workSlug.replace(/-/g, " ")}</p>
+            <p>
+              {t("inquiringAboutWork", {
+                name: workSlug.replace(/-/g, " "),
+              })}
+            </p>
           )}
           {artistSlug && (
-            <p>Inquiring about artist: {artistSlug.replace(/-/g, " ")}</p>
+            <p>
+              {t("inquiringAboutArtist", {
+                name: artistSlug.replace(/-/g, " "),
+              })}
+            </p>
           )}
         </div>
       )}
@@ -85,7 +94,7 @@ export function InquiryForm() {
             htmlFor="name"
             className="mb-2 block text-[10px] uppercase tracking-[0.25em] text-gold-muted"
           >
-            Name *
+            {t("nameLabel")}
           </label>
           <input id="name" name="name" required className={fieldClass} />
         </div>
@@ -94,7 +103,7 @@ export function InquiryForm() {
             htmlFor="email"
             className="mb-2 block text-[10px] uppercase tracking-[0.25em] text-gold-muted"
           >
-            Email *
+            {t("emailLabel")}
           </label>
           <input
             id="email"
@@ -112,7 +121,7 @@ export function InquiryForm() {
             htmlFor="country"
             className="mb-2 block text-[10px] uppercase tracking-[0.25em] text-gold-muted"
           >
-            Country
+            {t("countryLabel")}
           </label>
           <input id="country" name="country" className={fieldClass} />
         </div>
@@ -121,7 +130,7 @@ export function InquiryForm() {
             htmlFor="inquiryType"
             className="mb-2 block text-[10px] uppercase tracking-[0.25em] text-gold-muted"
           >
-            Inquiry type *
+            {t("inquiryTypeLabel")}
           </label>
           <select
             id="inquiryType"
@@ -130,9 +139,11 @@ export function InquiryForm() {
             required
             className={fieldClass}
           >
-            <option value="general">General inquiry</option>
-            <option value="specific-work">Specific work</option>
-            <option value="artist-partnership">Artist partnership</option>
+            <option value="general">{t("inquiryGeneral")}</option>
+            <option value="specific-work">{t("inquirySpecificWork")}</option>
+            <option value="artist-partnership">
+              {t("inquiryArtistPartnership")}
+            </option>
           </select>
         </div>
       </div>
@@ -142,7 +153,7 @@ export function InquiryForm() {
           htmlFor="message"
           className="mb-2 block text-[10px] uppercase tracking-[0.25em] text-gold-muted"
         >
-          Message *
+          {t("messageLabel")}
         </label>
         <textarea
           id="message"
@@ -166,7 +177,7 @@ export function InquiryForm() {
         disabled={isPending}
         className="border border-gold/50 px-10 py-4 text-[11px] uppercase tracking-[0.25em] text-gold transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] hover:border-gold hover:bg-gold hover:text-ink hover:shadow-[0_8px_32px_rgba(201,169,98,0.25)] active:scale-[0.98] disabled:opacity-50"
       >
-        {isPending ? "Sending…" : "Send inquiry"}
+        {isPending ? t("submitting") : t("submit")}
       </button>
     </form>
   );

@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import { useTranslations } from "next-intl";
 import { useState } from "react";
 
 type WorkGalleryProps = {
@@ -9,6 +10,7 @@ type WorkGalleryProps = {
 };
 
 export function WorkGallery({ images, title }: WorkGalleryProps) {
+  const t = useTranslations("works");
   const [active, setActive] = useState(0);
   const [prev, setPrev] = useState(0);
 
@@ -45,7 +47,7 @@ export function WorkGallery({ images, title }: WorkGalleryProps) {
             <button
               key={src}
               type="button"
-              aria-label={`View image ${i + 1}`}
+              aria-label={t("viewImage", { index: i + 1 })}
               onClick={() => selectImage(i)}
               className={`relative h-16 w-16 overflow-hidden border-2 transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] ${
                 i === active

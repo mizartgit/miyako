@@ -1,15 +1,32 @@
 import type { Metadata } from "next";
+import { getTranslations, setRequestLocale } from "next-intl/server";
 import { ArtistGrid } from "@/components/artists/ArtistGrid";
 import { Reveal } from "@/components/ui/Reveal";
+import { routing } from "@/i18n/routing";
 import { getAllArtists } from "@/lib/content";
 
-export const metadata: Metadata = {
-  title: "Artists",
-  description:
-    "We partner with a small number of exceptional artisans, celebrating their craftsmanship, heritage, and the traditions.",
+type Props = {
+  params: Promise<{ locale: string }>;
 };
 
-export default function ArtistsPage() {
+export function generateStaticParams() {
+  return routing.locales.map((locale) => ({ locale }));
+}
+
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const { locale } = await params;
+  const t = await getTranslations({ locale, namespace: "artists" });
+
+  return {
+    title: t("metaTitle"),
+    description: t("metaDescription"),
+  };
+}
+
+export default async function ArtistsPage({ params }: Props) {
+  const { locale } = await params;
+  setRequestLocale(locale);
+  const t = await getTranslations("artists");
   const artists = getAllArtists();
 
   return (
@@ -18,16 +35,15 @@ export default function ArtistsPage() {
         <div className="mx-auto max-w-3xl text-center">
           <Reveal>
             <p className="text-[10px] uppercase tracking-[0.35em] text-gold-muted">
-              The Roster
+              {t("rosterLabel")}
             </p>
             <h1 className="mt-6 font-serif text-4xl text-charcoal md:text-5xl">
-              Our Artists
+              {t("title")}
             </h1>
           </Reveal>
           <Reveal delay={120}>
             <p className="mx-auto mt-8 max-w-2xl text-sm leading-relaxed text-charcoal/70 md:text-base">
-              We partner with a small number of exceptional artisans, celebrating
-              their craftsmanship, heritage, and the traditions.
+              {t("intro")}
             </p>
           </Reveal>
         </div>

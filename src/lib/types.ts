@@ -1,6 +1,7 @@
 export type Artist = {
   slug: string;
   name: string;
+  nameJa?: string;
   region: string;
   craft: string;
   portrait: string;
@@ -16,9 +17,11 @@ export type Work = {
   slug: string;
   artistSlug: string;
   title: string;
+  titleJa?: string;
   material: string;
   dimensions: string;
   story: string;
+  storyJa?: string;
   images: string[];
   featured?: boolean;
 };

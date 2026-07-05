@@ -1,5 +1,6 @@
 "use server";
 
+import { getTranslations } from "next-intl/server";
 import type { InquiryFormData } from "@/lib/types";
 
 export type InquiryResult =
@@ -9,16 +10,17 @@ export type InquiryResult =
 export async function submitInquiry(
   data: InquiryFormData,
 ): Promise<InquiryResult> {
+  const t = await getTranslations("contact");
   const { name, email, country, inquiryType, message, workSlug, artistSlug } =
     data;
 
   if (!name.trim() || !email.trim() || !message.trim()) {
-    return { success: false, error: "Please fill in all required fields." };
+    return { success: false, error: t("errorRequired") };
   }
 
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   if (!emailRegex.test(email)) {
-    return { success: false, error: "Please enter a valid email address." };
+    return { success: false, error: t("errorEmail") };
   }
 
   const apiKey = process.env.RESEND_API_KEY;
@@ -58,18 +60,12 @@ export async function submitInquiry(
       });
 
       if (!res.ok) {
-        return {
-          success: false,
-          error: "Unable to send inquiry. Please try again or email us directly.",
-        };
+        return { success: false, error: t("errorSend") };
       }
 
       return { success: true, method: "email" };
     } catch {
-      return {
-        success: false,
-        error: "Unable to send inquiry. Please try again or email us directly.",
-      };
+      return { success: false, error: t("errorSend") };
     }
   }
 

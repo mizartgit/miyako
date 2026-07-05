@@ -1,20 +1,22 @@
 "use client";
 
-import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { useEffect, useState } from "react";
-
-const navLinks = [
-  { href: "/artists", label: "Artists" },
-  { href: "/mission", label: "Mission" },
-  { href: "/contact", label: "Contact" },
-];
+import { LanguageSwitcher } from "@/components/layout/LanguageSwitcher";
+import { Link, usePathname } from "@/i18n/navigation";
 
 export function Header() {
+  const t = useTranslations("nav");
   const pathname = usePathname();
   const isHome = pathname === "/";
   const [scrolled, setScrolled] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
+
+  const navLinks = [
+    { href: "/artists" as const, label: t("artists") },
+    { href: "/mission" as const, label: t("mission") },
+    { href: "/contact" as const, label: t("contact") },
+  ];
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > 40);
@@ -41,64 +43,70 @@ export function Header() {
       } ${menuOpen ? "translate-y-0" : ""}`}
       style={{ height: "var(--header-height)" }}
     >
-      <div className="mx-auto flex h-full max-w-7xl items-center justify-between px-6">
+      <div className="mx-auto flex h-full max-w-7xl items-center justify-between gap-4 px-6">
         <Link
           href="/"
           onClick={() => setMenuOpen(false)}
-          className={`font-serif text-xl tracking-[0.35em] transition-colors duration-500 ${
+          className={`shrink-0 font-serif text-xl tracking-[0.35em] transition-colors duration-500 ${
             solid ? "text-charcoal hover:text-gold" : "text-gold"
           }`}
         >
           MIYAKO
         </Link>
 
-        <nav className="hidden items-center gap-10 md:flex">
-          {navLinks.map(({ href, label }) => {
-            const active =
-              pathname === href || pathname.startsWith(href + "/");
-            return (
-              <Link
-                key={href}
-                href={href}
-                className={`link-underline text-[11px] uppercase tracking-[0.25em] transition-colors duration-500 ${
-                  active
-                    ? "text-gold"
-                    : solid
-                      ? "text-charcoal/70 hover:text-gold"
-                      : "text-stone/70 hover:text-gold"
-                }`}
-              >
-                {label}
-              </Link>
-            );
-          })}
-        </nav>
+        <div className="hidden items-center gap-8 md:flex">
+          <nav className="flex items-center gap-10">
+            {navLinks.map(({ href, label }) => {
+              const active =
+                pathname === href || pathname.startsWith(`${href}/`);
+              return (
+                <Link
+                  key={href}
+                  href={href}
+                  className={`link-underline text-[11px] uppercase tracking-[0.25em] transition-colors duration-500 ${
+                    active
+                      ? "text-gold"
+                      : solid
+                        ? "text-charcoal/70 hover:text-gold"
+                        : "text-stone/70 hover:text-gold"
+                  }`}
+                >
+                  {label}
+                </Link>
+              );
+            })}
+          </nav>
+          <LanguageSwitcher solid={solid} />
+        </div>
 
-        <button
-          type="button"
-          aria-label={menuOpen ? "Close menu" : "Open menu"}
-          aria-expanded={menuOpen}
-          className={`relative z-10 flex h-10 w-10 flex-col items-center justify-center gap-1.5 md:hidden ${
-            solid || menuOpen ? "text-charcoal" : "text-gold"
-          }`}
-          onClick={() => setMenuOpen((o) => !o)}
-        >
-          <span
-            className={`block h-px w-6 bg-current transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] ${
-              menuOpen ? "translate-y-[5px] rotate-45" : ""
+        <div className="flex items-center gap-4 md:hidden">
+          <LanguageSwitcher solid={solid || menuOpen} />
+          <button
+            type="button"
+            aria-label={menuOpen ? t("closeMenu") : t("openMenu")}
+            aria-expanded={menuOpen}
+            className={`relative z-10 flex h-10 w-10 flex-col items-center justify-center gap-1.5 ${
+              solid || menuOpen ? "text-charcoal" : "text-gold"
             }`}
-          />
-          <span
-            className={`block h-px w-6 bg-current transition-all duration-400 ${
-              menuOpen ? "scale-x-0 opacity-0" : "opacity-100"
-            }`}
-          />
-          <span
-            className={`block h-px w-6 bg-current transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] ${
-              menuOpen ? "-translate-y-[5px] -rotate-45" : ""
-            }`}
-          />
-        </button>
+            onClick={() => setMenuOpen((o) => !o)}
+          >
+            <span
+              className={`block h-px w-6 bg-current transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] ${
+                menuOpen ? "translate-y-[5px] rotate-45" : ""
+              }`}
+            />
+            <span
+              className={`block h-px w-6 bg-current transition-all duration-400 ${
+                menuOpen ? "scale-x-0 opacity-0" : "opacity-100"
+              }`}
+            />
+            <span
+              className={`block h-px w-6 bg-current transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)] ${
+                menuOpen ? "-translate-y-[5px] -rotate-45" : ""
+              }`}
+            />
+          </button>
+        </div>
       </div>
 
       <nav
@@ -116,7 +124,7 @@ export function Header() {
               href={href}
               onClick={() => setMenuOpen(false)}
               className={`py-3 text-sm uppercase tracking-[0.25em] transition-all duration-500 hover:text-gold ${
-                pathname === href || pathname.startsWith(href + "/")
+                pathname === href || pathname.startsWith(`${href}/`)
                   ? "text-gold"
                   : "text-charcoal"
               } ${menuOpen ? "translate-y-0 opacity-100" : "translate-y-2 opacity-0"}`}

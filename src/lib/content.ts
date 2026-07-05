@@ -44,3 +44,10 @@ export function getArtistSlugs(): string[] {
 export function getWorkSlugs(): string[] {
   return works.map((w) => w.slug);
 }
+
+export function getWorkStory(work: Work, locale: string): string {
+  if (locale === "ja" && work.storyJa) {
+    return work.storyJa;
+  }
+  return work.story;
+}
