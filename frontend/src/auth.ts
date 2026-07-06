@@ -48,21 +48,8 @@ providers.push(
   }),
 );
 
-function getAuthSecret(): string | undefined {
-  return (
-    process.env.AUTH_SECRET ??
-    process.env.NEXTAUTH_SECRET ??
-    (process.env.NODE_ENV === "development"
-      ? "dev-local-auth-secret-minimum-32-chars"
-      : undefined)
-  );
-}
-
 export const { handlers, auth, signIn, signOut } = NextAuth({
   ...authConfig,
-  secret: getAuthSecret(),
   adapter: isDbConfigured() ? PrismaAdapter(prisma) : undefined,
-  session: { strategy: "jwt" },
   providers,
-  trustHost: true,
 });
