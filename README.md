@@ -90,15 +90,18 @@ Open:
 
 Vercel hosts the **Next.js gallery**. The Medusa backend is a separate service (Railway, Render, Medusa Cloud, etc.) — it is **not** built on Vercel.
 
-In your Vercel project settings:
+Configure everything in the Vercel dashboard (there is **no `vercel.json`** — Vercel auto-detects the setup):
 
 | Setting | Value |
 |---------|--------|
 | **Root Directory** | `frontend` |
-| **Install Command** | `npm ci` (runs at monorepo root automatically) |
-| **Build Command** | `npm run build` (default from `frontend/package.json`) |
+| **Framework Preset** | Next.js (auto-detected) |
+| **Install Command** | leave default / override OFF |
+| **Build Command** | leave default / override OFF |
 
-If the Root Directory is left at the repo root, `vercel.json` still runs `npm run build -w frontend` so the Medusa backend is never invoked.
+Because `frontend/` is an npm workspace member, Vercel installs from the monorepo root (resolving `@miyako/shared` and building `shared/dist` via its `prepare` script), then runs `npm run build` inside `frontend/` (`prisma generate && next build`). The Medusa backend is never installed or built on Vercel.
+
+> Do **not** add a root `vercel.json` with `npm run build -w frontend`. The `-w`/`--workspace` flag only works from the monorepo root, but `Root Directory = frontend` runs commands inside `frontend/`, which has no `workspaces` field — causing `No workspaces found: --workspace=frontend`.
 
 The backend requires a standalone install (`cd backend && npm install`) before `npm run build:backend` — that only runs locally via `npm run build:all`.
 
