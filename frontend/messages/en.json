@@ -135,7 +135,22 @@
     "newPasswordLabel": "New password",
     "updatePassword": "Update password",
     "updatingPassword": "Updating…",
-    "backToSignIn": "Back to sign in"
+    "backToSignIn": "Back to sign in",
+    "errors": {
+      "missingDatabaseUrl": "Authentication is unavailable: the database URL is not configured.",
+      "missingAuthSecret": "Authentication is unavailable: AUTH_SECRET is not configured.",
+      "databaseUnavailable": "The database is currently unavailable. Please try again shortly.",
+      "databaseConnectionFailed": "Could not connect to the database. Please try again shortly.",
+      "databaseSchemaMissing": "The account database is not initialized. Please contact support.",
+      "emailAlreadyExists": "An account with this email already exists.",
+      "invalidEmail": "Please enter a valid email address.",
+      "invalidCredentials": "Invalid email or password.",
+      "fieldsRequired": "All fields are required.",
+      "passwordTooShort": "Password must be at least 8 characters.",
+      "authConfigurationError": "Authentication configuration error. Please contact support.",
+      "internalAuthError": "An unexpected authentication error occurred. Please try again.",
+      "signInAfterRegisterFailed": "Your account was created, but sign-in failed. Please sign in manually."
+    }
   },
   "selections": {
     "label": "Your Collection",

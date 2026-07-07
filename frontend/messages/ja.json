@@ -135,7 +135,22 @@
     "newPasswordLabel": "New password",
     "updatePassword": "Update password",
     "updatingPassword": "Updating…",
-    "backToSignIn": "Back to sign in"
+    "backToSignIn": "Back to sign in",
+    "errors": {
+      "missingDatabaseUrl": "認証を利用できません：データベース URL が設定されていません。",
+      "missingAuthSecret": "認証を利用できません：AUTH_SECRET が設定されていません。",
+      "databaseUnavailable": "データベースを現在利用できません。しばらくしてから再度お試しください。",
+      "databaseConnectionFailed": "データベースに接続できませんでした。しばらくしてから再度お試しください。",
+      "databaseSchemaMissing": "アカウント用データベースが初期化されていません。サポートにお問い合わせください。",
+      "emailAlreadyExists": "このメールアドレスは既に登録されています。",
+      "invalidEmail": "有効なメールアドレスを入力してください。",
+      "invalidCredentials": "メールアドレスまたはパスワードが正しくありません。",
+      "fieldsRequired": "すべての項目を入力してください。",
+      "passwordTooShort": "パスワードは8文字以上必要です。",
+      "authConfigurationError": "認証の設定に問題があります。サポートにお問い合わせください。",
+      "internalAuthError": "予期しない認証エラーが発生しました。再度お試しください。",
+      "signInAfterRegisterFailed": "アカウントは作成されましたが、サインインに失敗しました。手動でサインインしてください。"
+    }
   },
   "selections": {
     "label": "あなたのコレクション",

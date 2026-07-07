@@ -4,6 +4,7 @@ import { useTranslations } from "next-intl";
 import { signIn, useSession } from "next-auth/react";
 import { useState, useTransition } from "react";
 import { Link, useRouter } from "@/i18n/navigation";
+import { resolveSignInErrorMessage } from "@/lib/auth/client-errors";
 import { useCurrency } from "@/contexts/CurrencyContext";
 import { useSelections } from "@/contexts/SelectionsContext";
 
@@ -16,6 +17,7 @@ type CheckoutClientProps = {
 
 export function CheckoutClient({ cartId }: CheckoutClientProps) {
   const t = useTranslations("checkout");
+  const tAuth = useTranslations("auth");
   const { formatJpy } = useCurrency();
   const { items, subtotalJpy, isReady } = useSelections();
   const { data: session, status } = useSession();
@@ -45,7 +47,7 @@ export function CheckoutClient({ cartId }: CheckoutClientProps) {
       });
 
       if (result?.error) {
-        setError(t("invalidCredentials"));
+        setError(resolveSignInErrorMessage(tAuth, result.error));
         return;
       }
 

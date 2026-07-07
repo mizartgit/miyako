@@ -4,6 +4,7 @@ import { useTranslations } from "next-intl";
 import { useRouter } from "@/i18n/navigation";
 import { signIn } from "next-auth/react";
 import { useState, useTransition } from "react";
+import { resolveSignInErrorMessage } from "@/lib/auth/client-errors";
 
 const fieldClass =
   "w-full border-b border-charcoal/20 bg-transparent py-3 text-charcoal outline-none transition-[border-color] duration-500 focus:border-gold";
@@ -33,7 +34,7 @@ export function SignInForm({ callbackUrl }: { callbackUrl?: string }) {
       });
 
       if (result?.error) {
-        setError(t("invalidCredentials"));
+        setError(resolveSignInErrorMessage(t, result.error));
         return;
       }
 

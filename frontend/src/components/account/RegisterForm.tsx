@@ -5,6 +5,7 @@ import { Link, useRouter } from "@/i18n/navigation";
 import { signIn } from "next-auth/react";
 import { useState, useTransition } from "react";
 import { registerUser } from "@/lib/actions/auth";
+import { resolveAuthErrorMessage, resolveSignInErrorMessage } from "@/lib/auth/client-errors";
 
 const fieldClass =
   "w-full border-b border-charcoal/20 bg-transparent py-3 text-charcoal outline-none transition-[border-color] duration-500 focus:border-gold";
@@ -28,7 +29,12 @@ export function RegisterForm() {
       const result = await registerUser({ name, email, password });
 
       if (!result.success) {
-        setError(result.error);
+        setError(
+          resolveAuthErrorMessage(t, {
+            code: result.code,
+            fallback: result.error,
+          }),
+        );
         return;
       }
 
@@ -39,6 +45,10 @@ export function RegisterForm() {
       });
 
       if (signInResult?.error) {
+        setError(
+          resolveSignInErrorMessage(t, signInResult.error) ||
+            t("errors.signInAfterRegisterFailed"),
+        );
         router.push("/sign-in");
         return;
       }

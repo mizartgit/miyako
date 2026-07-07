@@ -4,6 +4,14 @@ import NextAuth from "next-auth";
 import Credentials from "next-auth/providers/credentials";
 import Google from "next-auth/providers/google";
 import { authConfig } from "@/auth.config";
+import {
+  AuthErrorCode,
+  logAuthError,
+  mapDatabaseError,
+} from "@/lib/auth/errors";
+import {
+  assertAuthEnvironment,
+} from "@/lib/auth/env";
 import { isDbConfigured, prisma } from "@/lib/db";
 
 const providers = [];
@@ -26,24 +34,54 @@ providers.push(
       password: { label: "Password", type: "password" },
     },
     async authorize(credentials) {
-      if (!isDbConfigured()) return null;
+      const envCheck = assertAuthEnvironment();
+      if (!envCheck.success) {
+        logAuthError("authorize", envCheck.code);
+        return null;
+      }
 
       const email = credentials?.email as string | undefined;
       const password = credentials?.password as string | undefined;
-      if (!email || !password) return null;
+      if (!email || !password) {
+        logAuthError("authorize", AuthErrorCode.INVALID_CREDENTIALS, {
+          reason: "missing credentials",
+        });
+        return null;
+      }
 
-      const user = await prisma.user.findUnique({ where: { email } });
-      if (!user?.passwordHash) return null;
+      try {
+        const user = await prisma.user.findUnique({
+          where: { email: email.toLowerCase() },
+        });
 
-      const valid = await bcrypt.compare(password, user.passwordHash);
-      if (!valid) return null;
+        if (!user?.passwordHash) {
+          logAuthError("authorize", AuthErrorCode.INVALID_CREDENTIALS, {
+            reason: "user not found or no password",
+            email: email.toLowerCase(),
+          });
+          return null;
+        }
 
-      return {
-        id: user.id,
-        email: user.email,
-        name: user.name,
-        image: user.image,
-      };
+        const valid = await bcrypt.compare(password, user.passwordHash);
+        if (!valid) {
+          logAuthError("authorize", AuthErrorCode.INVALID_CREDENTIALS, {
+            reason: "password mismatch",
+            email: email.toLowerCase(),
+          });
+          return null;
+        }
+
+        return {
+          id: user.id,
+          email: user.email,
+          name: user.name,
+          image: user.image,
+        };
+      } catch (error) {
+        const code = mapDatabaseError(error);
+        logAuthError("authorize", code, error);
+        return null;
+      }
     },
   }),
 );

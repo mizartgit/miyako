@@ -2,61 +2,71 @@
 
 import bcrypt from "bcryptjs";
 import { sendWelcomeEmail } from "@/lib/email/templates";
-import { isDbConfigured, prisma } from "@/lib/db";
+import {
+  AuthErrorCode,
+  authFailure,
+  logAuthError,
+  mapDatabaseError,
+  type AuthResult,
+} from "@/lib/auth/errors";
+import { assertAuthEnvironment } from "@/lib/auth/env";
+import { prisma } from "@/lib/db";
 
-export type AuthResult =
-  | { success: true }
-  | { success: false; error: string };
+export type { AuthResult } from "@/lib/auth/errors";
 
 export async function registerUser(data: {
   name: string;
   email: string;
   password: string;
 }): Promise<AuthResult> {
-  if (!isDbConfigured()) {
-    return {
-      success: false,
-      error: "Account registration requires a database connection.",
-    };
-  }
+  const envCheck = assertAuthEnvironment();
+  if (!envCheck.success) return envCheck;
 
   const { name, email, password } = data;
 
   if (!name.trim() || !email.trim() || !password) {
-    return { success: false, error: "All fields are required." };
+    return authFailure(AuthErrorCode.FIELDS_REQUIRED);
   }
 
   if (password.length < 8) {
-    return { success: false, error: "Password must be at least 8 characters." };
+    return authFailure(AuthErrorCode.PASSWORD_TOO_SHORT);
   }
 
   const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   if (!emailRegex.test(email)) {
-    return { success: false, error: "Please enter a valid email address." };
+    return authFailure(AuthErrorCode.INVALID_EMAIL);
   }
 
-  const existing = await prisma.user.findUnique({
-    where: { email: email.toLowerCase() },
-  });
+  const normalizedEmail = email.toLowerCase();
 
-  if (existing) {
-    return { success: false, error: "An account with this email already exists." };
+  try {
+    const existing = await prisma.user.findUnique({
+      where: { email: normalizedEmail },
+    });
+
+    if (existing) {
+      return authFailure(AuthErrorCode.EMAIL_ALREADY_EXISTS);
+    }
+
+    const passwordHash = await bcrypt.hash(password, 12);
+
+    await prisma.user.create({
+      data: {
+        name: name.trim(),
+        email: normalizedEmail,
+        passwordHash,
+        notificationPrefs: { create: {} },
+      },
+    });
+
+    void sendWelcomeEmail({ name: name.trim(), email: normalizedEmail });
+
+    return { success: true };
+  } catch (error) {
+    const code = mapDatabaseError(error);
+    logAuthError("registerUser", code, error);
+    return authFailure(code);
   }
-
-  const passwordHash = await bcrypt.hash(password, 12);
-
-  await prisma.user.create({
-    data: {
-      name: name.trim(),
-      email: email.toLowerCase(),
-      passwordHash,
-      notificationPrefs: { create: {} },
-    },
-  });
-
-  void sendWelcomeEmail({ name: name.trim(), email: email.toLowerCase() });
-
-  return { success: true };
 }
 
 export async function updateProfile(data: {
@@ -65,20 +75,25 @@ export async function updateProfile(data: {
   locale: string;
   currency: string;
 }): Promise<AuthResult> {
-  if (!isDbConfigured()) {
-    return { success: false, error: "Database not configured." };
+  const envCheck = assertAuthEnvironment();
+  if (!envCheck.success) return envCheck;
+
+  try {
+    await prisma.user.update({
+      where: { id: data.userId },
+      data: {
+        name: data.name.trim(),
+        locale: data.locale,
+        currency: data.currency,
+      },
+    });
+
+    return { success: true };
+  } catch (error) {
+    const code = mapDatabaseError(error);
+    logAuthError("updateProfile", code, error);
+    return authFailure(code);
   }
-
-  await prisma.user.update({
-    where: { id: data.userId },
-    data: {
-      name: data.name.trim(),
-      locale: data.locale,
-      currency: data.currency,
-    },
-  });
-
-  return { success: true };
 }
 
 export async function updateNotificationPrefs(data: {
@@ -88,35 +103,45 @@ export async function updateNotificationPrefs(data: {
   selectionReminders: boolean;
   marketing: boolean;
 }): Promise<AuthResult> {
-  if (!isDbConfigured()) {
-    return { success: false, error: "Database not configured." };
+  const envCheck = assertAuthEnvironment();
+  if (!envCheck.success) return envCheck;
+
+  try {
+    await prisma.notificationPreferences.upsert({
+      where: { userId: data.userId },
+      create: {
+        userId: data.userId,
+        orderUpdates: data.orderUpdates,
+        shippingUpdates: data.shippingUpdates,
+        selectionReminders: data.selectionReminders,
+        marketing: data.marketing,
+      },
+      update: {
+        orderUpdates: data.orderUpdates,
+        shippingUpdates: data.shippingUpdates,
+        selectionReminders: data.selectionReminders,
+        marketing: data.marketing,
+      },
+    });
+
+    return { success: true };
+  } catch (error) {
+    const code = mapDatabaseError(error);
+    logAuthError("updateNotificationPrefs", code, error);
+    return authFailure(code);
   }
-
-  await prisma.notificationPreferences.upsert({
-    where: { userId: data.userId },
-    create: {
-      userId: data.userId,
-      orderUpdates: data.orderUpdates,
-      shippingUpdates: data.shippingUpdates,
-      selectionReminders: data.selectionReminders,
-      marketing: data.marketing,
-    },
-    update: {
-      orderUpdates: data.orderUpdates,
-      shippingUpdates: data.shippingUpdates,
-      selectionReminders: data.selectionReminders,
-      marketing: data.marketing,
-    },
-  });
-
-  return { success: true };
 }
 
 export async function deleteAccount(userId: string): Promise<AuthResult> {
-  if (!isDbConfigured()) {
-    return { success: false, error: "Database not configured." };
-  }
+  const envCheck = assertAuthEnvironment();
+  if (!envCheck.success) return envCheck;
 
-  await prisma.user.delete({ where: { id: userId } });
-  return { success: true };
+  try {
+    await prisma.user.delete({ where: { id: userId } });
+    return { success: true };
+  } catch (error) {
+    const code = mapDatabaseError(error);
+    logAuthError("deleteAccount", code, error);
+    return authFailure(code);
+  }
 }

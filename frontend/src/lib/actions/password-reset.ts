@@ -2,9 +2,17 @@
 
 import bcrypt from "bcryptjs";
 import crypto from "crypto";
-import { isDbConfigured, prisma } from "@/lib/db";
-import { sendPasswordResetEmail } from "@/lib/email/templates";
 import type { AuthResult } from "@/lib/actions/auth";
+import {
+  AuthErrorCode,
+  authFailure,
+  authFailureCustom,
+  logAuthError,
+  mapDatabaseError,
+} from "@/lib/auth/errors";
+import { assertAuthEnvironment } from "@/lib/auth/env";
+import { prisma } from "@/lib/db";
+import { sendPasswordResetEmail } from "@/lib/email/templates";
 
 const RESET_PREFIX = "password-reset:";
 const RESET_TTL_MS = 60 * 60 * 1000;
@@ -13,36 +21,44 @@ export async function requestPasswordReset(
   email: string,
   locale = "en",
 ): Promise<AuthResult> {
-  if (!isDbConfigured()) {
-    return { success: false, error: "Database not configured." };
-  }
+  const envCheck = assertAuthEnvironment();
+  if (!envCheck.success) return envCheck;
 
   const normalized = email.trim().toLowerCase();
   if (!normalized) {
-    return { success: false, error: "Email is required." };
+    return authFailureCustom(
+      AuthErrorCode.FIELDS_REQUIRED,
+      "Email is required.",
+    );
   }
 
-  const user = await prisma.user.findUnique({ where: { email: normalized } });
+  try {
+    const user = await prisma.user.findUnique({ where: { email: normalized } });
 
-  // Always succeed to avoid email enumeration
-  if (!user?.passwordHash) {
+    // Always succeed to avoid email enumeration
+    if (!user?.passwordHash) {
+      return { success: true };
+    }
+
+    const token = crypto.randomBytes(32).toString("hex");
+    const identifier = `${RESET_PREFIX}${normalized}`;
+
+    await prisma.verificationToken.deleteMany({ where: { identifier } });
+    await prisma.verificationToken.create({
+      data: {
+        identifier,
+        token,
+        expires: new Date(Date.now() + RESET_TTL_MS),
+      },
+    });
+
+    await sendPasswordResetEmail({ email: normalized, token, locale });
     return { success: true };
+  } catch (error) {
+    const code = mapDatabaseError(error);
+    logAuthError("requestPasswordReset", code, error);
+    return authFailure(code);
   }
-
-  const token = crypto.randomBytes(32).toString("hex");
-  const identifier = `${RESET_PREFIX}${normalized}`;
-
-  await prisma.verificationToken.deleteMany({ where: { identifier } });
-  await prisma.verificationToken.create({
-    data: {
-      identifier,
-      token,
-      expires: new Date(Date.now() + RESET_TTL_MS),
-    },
-  });
-
-  await sendPasswordResetEmail({ email: normalized, token, locale });
-  return { success: true };
 }
 
 export async function resetPassword(data: {
@@ -50,33 +66,41 @@ export async function resetPassword(data: {
   token: string;
   password: string;
 }): Promise<AuthResult> {
-  if (!isDbConfigured()) {
-    return { success: false, error: "Database not configured." };
-  }
+  const envCheck = assertAuthEnvironment();
+  if (!envCheck.success) return envCheck;
 
   const normalized = data.email.trim().toLowerCase();
   const identifier = `${RESET_PREFIX}${normalized}`;
 
   if (data.password.length < 8) {
-    return { success: false, error: "Password must be at least 8 characters." };
+    return authFailure(AuthErrorCode.PASSWORD_TOO_SHORT);
   }
 
-  const record = await prisma.verificationToken.findFirst({
-    where: { identifier, token: data.token },
-  });
+  try {
+    const record = await prisma.verificationToken.findFirst({
+      where: { identifier, token: data.token },
+    });
 
-  if (!record || record.expires < new Date()) {
-    return { success: false, error: "This reset link is invalid or has expired." };
+    if (!record || record.expires < new Date()) {
+      return authFailureCustom(
+        AuthErrorCode.INTERNAL_AUTH_ERROR,
+        "This reset link is invalid or has expired.",
+      );
+    }
+
+    const passwordHash = await bcrypt.hash(data.password, 12);
+
+    await prisma.user.update({
+      where: { email: normalized },
+      data: { passwordHash },
+    });
+
+    await prisma.verificationToken.deleteMany({ where: { identifier } });
+
+    return { success: true };
+  } catch (error) {
+    const code = mapDatabaseError(error);
+    logAuthError("resetPassword", code, error);
+    return authFailure(code);
   }
-
-  const passwordHash = await bcrypt.hash(data.password, 12);
-
-  await prisma.user.update({
-    where: { email: normalized },
-    data: { passwordHash },
-  });
-
-  await prisma.verificationToken.deleteMany({ where: { identifier } });
-
-  return { success: true };
 }

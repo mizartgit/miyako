@@ -1,4 +1,5 @@
 import { PrismaClient } from "@prisma/client";
+import { isDatabaseConfigured } from "@/lib/auth/env";
 
 const globalForPrisma = globalThis as unknown as {
   prisma: PrismaClient | undefined;
@@ -14,6 +15,7 @@ if (process.env.NODE_ENV !== "production") {
   globalForPrisma.prisma = prisma;
 }
 
+/** @deprecated Prefer `isDatabaseConfigured()` from `@/lib/auth/env`. */
 export function isDbConfigured(): boolean {
-  return Boolean(process.env.DATABASE_URL);
+  return isDatabaseConfigured();
 }
