@@ -20,20 +20,19 @@ Install on your machine:
 
 ---
 
-## Step 2 — Create a PostgreSQL database
+## Step 2 — PostgreSQL database
 
-### Option A: Neon (recommended)
+Use your **existing separate Medusa database** in Neon (not the frontend `neondb` database used for auth/selections).
 
 1. Sign in at [neon.tech](https://neon.tech)
-2. Create a project (e.g. `miyako`)
-3. Create a database named `miyako_medusa` (or reuse `neondb`)
-4. Copy the connection string:
+2. Open your Neon project
+3. Copy the connection string for your Medusa database (from the Neon dashboard)
 
 ```
-postgresql://user:password@ep-xxx.region.aws.neon.tech/miyako_medusa?sslmode=require
+postgresql://user:password@ep-xxx.region.aws.neon.tech/your_medusa_db?sslmode=require
 ```
 
-> **Note:** The frontend Prisma database and Medusa can share the same Neon **project** but should use **separate database names** to keep schemas isolated. Alternatively, use one database — Medusa and Prisma tables coexist with different prefixes.
+> **Note:** Frontend (Prisma) and Medusa should use **different database names** in the same Neon project. No code changes are required — only `DATABASE_URL` differs between Vercel and Railway.
 
 ---
 
@@ -266,6 +265,73 @@ For production, switch to S3/R2 by replacing the file module in `medusa-config.t
 - [ ] Configure Stripe (Phase 2)
 - [ ] Set up Medusa worker mode for background jobs
 - [ ] Register webhooks → `frontend` `/api/webhooks/medusa`
+
+---
+
+## Railway production deploy
+
+Deploy from the **monorepo root** (not `backend/` alone — the seed script reads `frontend/content/works.json` and `@miyako/shared` is a sibling package).
+
+### 1. Neon — existing Medusa database
+
+Use the connection string for your **existing separate Medusa database** in Neon (keep frontend auth/selections on `neondb` / Vercel `DATABASE_URL`).
+
+```
+postgresql://user:pass@ep-xxx.region.aws.neon.tech/your_medusa_db?sslmode=require
+```
+
+### 2. Upstash Redis
+
+1. [upstash.com](https://upstash.com) → Create Redis database
+2. Copy the **`rediss://`** URL (TCP, not REST)
+
+### 3. Configure production env
+
+```bash
+cp backend/.env.production.example backend/.env.production
+# Fill in DATABASE_URL, REDIS_URL, JWT_SECRET, COOKIE_SECRET
+openssl rand -base64 32   # JWT_SECRET
+openssl rand -base64 32   # COOKIE_SECRET
+```
+
+CORS is preconfigured for `https://miyako-psi.vercel.app` in `.env.production.example`.
+
+### 4. Deploy
+
+```bash
+npm i -g @railway/cli   # or use npx @railway/cli
+railway login
+./backend/scripts/deploy-railway.sh
+```
+
+The script pushes env vars, deploys, sets `MEDUSA_BACKEND_URL` from your Railway domain, runs migrations + seed, creates an admin user, and prints the **publishable API key**.
+
+### 5. Manual steps (if not using deploy script)
+
+```bash
+railway link
+railway up
+railway domain   # generate public URL if needed
+railway variable set MEDUSA_BACKEND_URL=https://YOUR.up.railway.app --environment production
+railway run -- bash backend/scripts/production-setup.sh
+```
+
+### 6. Verify + wire Vercel
+
+```bash
+MEDUSA_BACKEND_URL=https://YOUR.up.railway.app \
+NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY=pk_... \
+./backend/scripts/verify-medusa-connection.sh
+```
+
+Add to **Vercel → Environment Variables (Production)**:
+
+| Variable | Value |
+|----------|-------|
+| `MEDUSA_BACKEND_URL` | `https://YOUR.up.railway.app` |
+| `NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY` | `pk_...` from setup output |
+
+Redeploy Vercel. Local dev keeps using `localhost:9000` in `frontend/.env.local`.
 
 ---
 

@@ -1,0 +1,22 @@
+[variables]
+# Railway/Nixpacks sets NODE_ENV=production; keep devDependencies for TypeScript builds.
+NPM_CONFIG_PRODUCTION = "false"
+
+[phases.setup]
+nixPkgs = ["nodejs_20"]
+
+[phases.install]
+# Custom cmds replace Nixpacks' default `npm ci`; keep an explicit root install first.
+cmds = [
+  "npm ci --include=dev",
+  "npm ci --include=dev --prefix backend",
+]
+
+[phases.build]
+cmds = [
+  "npm run build:shared",
+  "npm run build --prefix backend",
+]
+
+[start]
+cmd = "npm run start --prefix backend"

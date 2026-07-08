@@ -1,0 +1,10 @@
+frontend/.next
+frontend/node_modules
+node_modules
+backend/node_modules
+backend/.medusa
+backend/static
+.git
+.cursor
+*.md
+!backend/README.md

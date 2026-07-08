@@ -1,0 +1,15 @@
+# Keep the Docker build context close to Railway/Nixpacks uploads.
+node_modules
+frontend/node_modules
+frontend/.next
+backend/node_modules
+backend/.medusa
+backend/static
+.git
+.cursor
+*.md
+!backend/README.md
+.env
+.env.*
+!.env.example
+!backend/.env.production.example

@@ -18,9 +18,7 @@
     "prepare": "tsc -p tsconfig.build.json"
   },
   "dependencies": {
+    "typescript": "^5",
     "zod": "4.2.0"
-  },
-  "devDependencies": {
-    "typescript": "^5"
   }
 }

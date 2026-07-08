@@ -17,10 +17,7 @@
     "forceConsistentCasingInFileNames": true,
     "resolveJsonModule": true,
     "checkJs": false,
-    "strictNullChecks": true,
-    "paths": {
-      "@miyako/shared": ["../shared/src/index.ts"]
-    }
+    "strictNullChecks": true
   },
   "ts-node": {
     "swc": true

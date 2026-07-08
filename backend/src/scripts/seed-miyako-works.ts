@@ -186,7 +186,10 @@ export default async function seedMiyakoWorks({ container }: ExecArgs) {
     entity: "region",
     fields: ["id", "currency_code", "name"],
   });
-  let jpRegion = regions.find((r) => r.currency_code === "jpy");
+  type RegionRef = { id: string; currency_code: string; name?: string };
+  let jpRegion: RegionRef | undefined = regions.find(
+    (r) => r.currency_code === "jpy",
+  );
   if (!jpRegion) {
     const { result } = await createRegionsWorkflow(container).run({
       input: {
@@ -200,7 +203,11 @@ export default async function seedMiyakoWorks({ container }: ExecArgs) {
         ],
       },
     });
-    jpRegion = result[0];
+    jpRegion = {
+      id: result[0].id,
+      currency_code: result[0].currency_code,
+      name: result[0].name,
+    };
     await createTaxRegionsWorkflow(container).run({
       input: [{ country_code: "jp", provider_id: "tp_system" }],
     });

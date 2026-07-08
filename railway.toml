@@ -1,0 +1,13 @@
+# MIYAKO Medusa backend on Railway (monorepo root).
+# Railway dashboard → Settings → Root Directory should stay at repo root (.)
+
+[build]
+builder = "DOCKERFILE"
+dockerfilePath = "Dockerfile"
+
+[deploy]
+startCommand = "npm run start --prefix backend"
+healthcheckPath = "/store/custom"
+healthcheckTimeout = 300
+restartPolicyType = "ON_FAILURE"
+restartPolicyMaxRetries = 5
