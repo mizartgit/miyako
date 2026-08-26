@@ -215,20 +215,49 @@ The site always displays **both English and Japanese** titles together.
 
 ---
 
-## Stripe (Phase 2 — prepared)
+## Stripe checkout
 
-When ready:
+### 1. Stripe Dashboard
 
-1. Create a [Stripe](https://stripe.com) account
-2. Add to `backend/.env`:
+1. Create a [Stripe](https://stripe.com) account (use **Test mode** first).
+2. Copy **Secret key** (`sk_test_...`) and **Publishable key** (`pk_test_...`).
+
+### 2. Backend (Medusa on Railway)
+
+Add to `backend/.env.production` and Railway variables:
 
 ```env
 STRIPE_API_KEY=sk_test_...
 STRIPE_WEBHOOK_SECRET=whsec_...
 ```
 
-3. Restart Medusa — `medusa-config.ts` auto-registers the Stripe payment module
-4. Complete checkout UI in `frontend/src/app/[locale]/checkout/`
+Redeploy Medusa, then enable Stripe on the Japan region:
+
+```bash
+cd backend
+railway run npx medusa exec ./src/scripts/ensure-stripe-region.ts
+```
+
+### 3. Stripe webhook
+
+In Stripe → Developers → Webhooks → Add endpoint:
+
+- **URL:** `https://YOUR-RAILWAY-URL/hooks/payment/stripe_stripe`
+- **Events:** `payment_intent.succeeded`, `payment_intent.amount_capturable_updated`, `payment_intent.payment_failed`
+
+Copy the signing secret into `STRIPE_WEBHOOK_SECRET`.
+
+### 4. Frontend (Vercel)
+
+```env
+NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=pk_test_...
+```
+
+Redeploy Vercel after saving.
+
+### 5. Shipping (required before checkout)
+
+Medusa needs at least one shipping option for the cart's region. In Medusa Admin → **Settings → Locations**, add a fulfillment set and flat-rate shipping option for Japan (JPY).
 
 See `backend/src/modules/payment/stripe-readme.ts`.
 

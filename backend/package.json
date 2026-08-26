@@ -14,7 +14,8 @@
     "db:migrate": "medusa db:migrate",
     "db:setup": "medusa db:setup",
     "seed:works": "medusa exec ./src/scripts/seed-miyako-works.ts",
-    "seed:publishable-key": "medusa exec ./src/scripts/ensure-publishable-key.ts"
+    "seed:publishable-key": "medusa exec ./src/scripts/ensure-publishable-key.ts",
+    "ensure-stripe": "medusa exec ./src/scripts/ensure-stripe-region.ts"
   },
   "dependencies": {
     "@medusajs/admin-sdk": "2.17.0",

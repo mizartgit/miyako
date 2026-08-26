@@ -7,6 +7,7 @@ import { Link, useRouter } from "@/i18n/navigation";
 import { resolveSignInErrorMessage } from "@/lib/auth/client-errors";
 import { useCurrency } from "@/contexts/CurrencyContext";
 import { useSelections } from "@/contexts/SelectionsContext";
+import { CheckoutPaymentSection } from "@/components/checkout/CheckoutPaymentSection";
 
 const fieldClass =
   "w-full border-b border-charcoal/20 bg-transparent py-3 text-charcoal outline-none transition-[border-color] duration-500 focus:border-gold";
@@ -130,18 +131,21 @@ export function CheckoutClient({ cartId }: CheckoutClientProps) {
               </p>
             </form>
           </div>
-        ) : (
-          <div className="space-y-6 text-sm text-charcoal/70">
-            <h2 className="text-[10px] uppercase tracking-[0.3em] text-gold-muted">
-              {t("paymentTitle")}
-            </h2>
-            <p>
+        ) : cartId ? (
+          <div className="space-y-6">
+            <p className="text-sm text-charcoal/70">
               {isAuthed
                 ? t("signedInAs", { email: session?.user?.email ?? "" })
                 : t("guestNote")}
             </p>
-            {cartId ? <p>{t("cartReady", { cartId })}</p> : <p>{t("noCart")}</p>}
-            <p>{t("stripePhase")}</p>
+            <CheckoutPaymentSection cartId={cartId} isGuest={!isAuthed} />
+            <Link href="/selections" className="link-underline text-sm text-gold">
+              {t("backToSelections")}
+            </Link>
+          </div>
+        ) : (
+          <div className="space-y-6 text-sm text-charcoal/70">
+            <p>{t("noCart")}</p>
             <Link href="/selections" className="link-underline text-gold">
               {t("backToSelections")}
             </Link>

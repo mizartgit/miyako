@@ -198,7 +198,9 @@ export default async function seedMiyakoWorks({ container }: ExecArgs) {
             name: "Japan",
             currency_code: "jpy",
             countries: ["jp"],
-            payment_providers: ["pp_system_default"],
+            payment_providers: process.env.STRIPE_API_KEY
+              ? ["pp_system_default", "pp_stripe_stripe"]
+              : ["pp_system_default"],
           },
         ],
       },

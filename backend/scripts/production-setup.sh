@@ -44,6 +44,9 @@ else
   echo "    Admin user may already exist — skipping."
 fi
 
+echo "==> Enabling Stripe on JPY region (when STRIPE_API_KEY is set)..."
+npx medusa exec ./src/scripts/ensure-stripe-region.ts
+
 echo "==> Ensuring publishable API key..."
 npx medusa exec ./src/scripts/ensure-publishable-key.ts 2>&1 | tee /tmp/miyako-publishable-key.log
 PUBLISHABLE_KEY="$(grep 'PUBLISHABLE_API_KEY=' /tmp/miyako-publishable-key.log | tail -1 | cut -d= -f2-)"
