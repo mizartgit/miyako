@@ -7,7 +7,8 @@
   "private": true,
   "scripts": {
     "build": "medusa build",
-    "start": "medusa start",
+    "start": "bash ./scripts/start-production.sh",
+    "start:medusa-server": "cd .medusa/server && npx medusa start",
     "dev": "medusa develop",
     "lint": "medusa lint",
     "db:migrate": "medusa db:migrate",

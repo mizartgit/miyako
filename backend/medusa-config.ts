@@ -73,4 +73,7 @@ module.exports = defineConfig({
         ]
       : []),
   ],
+  admin: {
+    backendUrl,
+  },
 });

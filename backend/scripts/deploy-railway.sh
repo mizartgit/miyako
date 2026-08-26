@@ -77,20 +77,40 @@ ensure_railway_project
 
 service_exists() {
   $RAILWAY service list --json 2>/dev/null | grep -q "\"name\":\"${RAILWAY_SERVICE}\"" \
-    || $RAILWAY service list 2>/dev/null | grep -qw "$RAILWAY_SERVICE"
+    || $RAILWAY service list 2>/dev/null | grep -qw "$RAILWAY_SERVICE" \
+    || $RAILWAY status 2>/dev/null | grep -qw "$RAILWAY_SERVICE"
 }
 
 service_linked() {
-  $RAILWAY status 2>/dev/null | grep -qE "(Service:[[:space:]]+${RAILWAY_SERVICE}|Linked service[[:space:]]+${RAILWAY_SERVICE})"
+  $RAILWAY status 2>/dev/null | grep -qE "(Service:[[:space:]]+${RAILWAY_SERVICE}|Linked service[[:space:]]+${RAILWAY_SERVICE})" \
+    || $RAILWAY status 2>/dev/null | grep -A2 "Linked service" | grep -qw "$RAILWAY_SERVICE"
+}
+
+resolve_railway_url() {
+  local url=""
+  url="$($RAILWAY domain list --service "$RAILWAY_SERVICE" --json 2>/dev/null \
+    | grep -o '"domain":"[^"]*"' | head -1 | cut -d'"' -f4 || true)"
+  if [[ -z "$url" ]]; then
+    url="$($RAILWAY status 2>/dev/null | grep -E '^[[:space:]]+url:' | head -1 | sed 's/.*url:[[:space:]]*//' || true)"
+  fi
+  if [[ -z "$url" ]]; then
+    return 1
+  fi
+  if [[ "$url" != http* ]]; then
+    url="https://${url}"
+  fi
+  printf '%s' "$url"
 }
 
 ensure_railway_service() {
+  if service_linked; then
+    echo "==> Railway service '$RAILWAY_SERVICE' is already linked."
+    return 0
+  fi
+
   if service_exists; then
-    echo "==> Railway service '$RAILWAY_SERVICE' already exists."
-    if ! service_linked; then
-      echo "==> Linking service '$RAILWAY_SERVICE'..."
-      $RAILWAY service link "$RAILWAY_SERVICE"
-    fi
+    echo "==> Linking existing service '$RAILWAY_SERVICE'..."
+    $RAILWAY service link "$RAILWAY_SERVICE"
     return 0
   fi
 
@@ -120,7 +140,7 @@ $RAILWAY up --detach --service "$RAILWAY_SERVICE"
 echo "==> Waiting for deployment to become healthy..."
 sleep 45
 
-RAILWAY_URL="$($RAILWAY domain --service "$RAILWAY_SERVICE" 2>/dev/null | head -1 || true)"
+RAILWAY_URL="$(resolve_railway_url || true)"
 if [[ -z "$RAILWAY_URL" ]]; then
   echo ""
   echo "WARN: No public Railway domain yet."
@@ -129,10 +149,6 @@ if [[ -z "$RAILWAY_URL" ]]; then
   echo "  3. Run: railway variable set MEDUSA_BACKEND_URL=https://YOUR-DOMAIN --environment production"
   echo "  4. Run: railway run -- bash backend/scripts/production-setup.sh"
   exit 0
-fi
-
-if [[ "$RAILWAY_URL" != http* ]]; then
-  RAILWAY_URL="https://${RAILWAY_URL}"
 fi
 
 echo "==> Setting MEDUSA_BACKEND_URL=$RAILWAY_URL"

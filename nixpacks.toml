@@ -19,4 +19,4 @@ cmds = [
 ]
 
 [start]
-cmd = "npm run start --prefix backend"
+cmd = "cd backend/.medusa/server && npx medusa start"

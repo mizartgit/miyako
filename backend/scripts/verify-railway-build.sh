@@ -78,6 +78,45 @@ if [[ "$build_status" -ne 0 ]]; then
   echo "WARN: medusa build exited $build_status but server output exists" >&2
 fi
 
+if [[ ! -f backend/.medusa/server/public/admin/index.html ]]; then
+  echo "ERROR: admin build missing at backend/.medusa/server/public/admin/index.html" >&2
+  exit 1
+fi
+echo "    OK: backend/.medusa/server/public/admin/index.html"
+
+echo ""
+echo "==> [runtime prep] prepare-medusa-server.sh"
+bash backend/scripts/prepare-medusa-server.sh
+
+if [[ ! -f backend/.medusa/server/node_modules/@miyako/shared/dist/index.js ]]; then
+  echo "ERROR: @miyako/shared missing from .medusa/server/node_modules" >&2
+  exit 1
+fi
+
+# Wrong cwd (backend/) is what Railway used before the fix — admin is not there.
+if [[ -f backend/public/admin/index.html ]]; then
+  echo "WARN: backend/public/admin/index.html exists (unexpected duplicate)" >&2
+fi
+if [[ ! -f backend/public/admin/index.html ]]; then
+  echo "    OK: backend/public/admin/index.html absent (expected — admin is under .medusa/server)"
+fi
+
+node <<'EOF'
+const fs = require("fs");
+const path = require("path");
+const wrong = path.join("backend", "public", "admin", "index.html");
+const right = path.join("backend", ".medusa", "server", "public", "admin", "index.html");
+if (fs.existsSync(wrong)) {
+  console.error("ERROR: admin index at backend/public/admin would mask misconfiguration");
+  process.exit(1);
+}
+if (!fs.existsSync(right)) {
+  console.error("ERROR: admin index missing at backend/.medusa/server/public/admin/index.html");
+  process.exit(1);
+}
+console.log("    OK: production admin path resolves from backend/.medusa/server only");
+EOF
+
 echo ""
 echo "=============================================="
 echo " Railway build simulation: SUCCESS"
