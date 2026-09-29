@@ -7,8 +7,14 @@ const stripeEnabled = Boolean(process.env.STRIPE_API_KEY);
 const storefrontUrl =
   process.env.STOREFRONT_URL ?? "https://miyako-psi.vercel.app";
 
-/** Public URL of this Medusa server (set to Railway URL in production). */
-const backendUrl = process.env.MEDUSA_BACKEND_URL ?? "http://localhost:9000";
+/**
+ * Public URL of this Medusa server.
+ * Empty string is treated as unset so a Docker build without the arg
+ * still falls back to localhost. Medusa inlines this into the admin
+ * bundle at `medusa build` time (`__BACKEND_URL__`).
+ */
+const backendUrl =
+  process.env.MEDUSA_BACKEND_URL || "http://localhost:9000";
 
 const defaultStoreCors = `http://localhost:3003,${storefrontUrl}`;
 
