@@ -71,14 +71,18 @@ function StripeCheckoutForm({
         elements,
         confirmParams: {
           return_url: `${window.location.origin}/${locale}/checkout/success?cart_id=${cartId}`,
+          // billingDetails is "never" on the Payment Element, so Stripe rejects
+          // the confirm unless every field is present — empty when not collected.
           payment_method_data: {
             billing_details: {
               email,
               name: billing.name,
-              phone: billing.phone || undefined,
+              phone: billing.phone ?? "",
               address: {
                 line1: billing.address.line1,
+                line2: "",
                 city: billing.address.city,
+                state: "",
                 postal_code: billing.address.postal_code,
                 country: billing.address.country,
               },
