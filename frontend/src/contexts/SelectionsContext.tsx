@@ -95,6 +95,8 @@ export function SelectionsProvider({ children }: { children: ReactNode }) {
   const itemsRef = useRef<SelectionItem[]>([]);
   const authedRef = useRef(false);
   const syncedRef = useRef(false);
+  /** Bumped on every visitor edit so slow server snapshots can't undo it. */
+  const editVersionRef = useRef(0);
 
   const commit = useCallback((next: SelectionItem[]) => {
     itemsRef.current = next;
@@ -102,16 +104,60 @@ export function SelectionsProvider({ children }: { children: ReactNode }) {
     writeLocal(next);
   }, []);
 
+  const commitEdit = useCallback(
+    (next: SelectionItem[]) => {
+      editVersionRef.current += 1;
+      commit(next);
+    },
+    [commit],
+  );
+
+  /**
+   * Applies a server snapshot requested at `version`. If the visitor edited
+   * meanwhile, keep their quantities and removals; take only fresh metadata.
+   */
+  const commitSnapshot = useCallback(
+    (fetched: SelectionItem[], sent: SelectionRecord[], version: number) => {
+      if (editVersionRef.current === version) {
+        commit(fetched);
+        return;
+      }
+
+      const fetchedBySlug = new Map(fetched.map((i) => [i.workSlug, i]));
+      const sentSlugs = new Set(sent.map((r) => r.workSlug));
+      const current = itemsRef.current;
+      const currentSlugs = new Set(current.map((i) => i.workSlug));
+
+      const next: SelectionItem[] = [];
+      for (const item of current) {
+        const fresh = fetchedBySlug.get(item.workSlug);
+        if (fresh) {
+          next.push({ ...fresh, quantity: item.quantity });
+        } else if (!sentSlugs.has(item.workSlug)) {
+          next.push(item);
+        }
+      }
+      for (const fresh of fetched) {
+        if (!currentSlugs.has(fresh.workSlug) && !sentSlugs.has(fresh.workSlug)) {
+          next.push(fresh);
+        }
+      }
+      commit(next);
+    },
+    [commit],
+  );
+
   const refreshFromMedusa = useCallback(async () => {
     const records = itemsRef.current.map(toRecord);
     if (!records.length) return;
+    const version = editVersionRef.current;
     try {
       const enriched = await enrichSelectionItems(records, locale);
-      if (enriched.length) commit(enriched);
+      if (enriched.length) commitSnapshot(enriched, records, version);
     } catch {
       /* keep cached snapshot */
     }
-  }, [commit, locale]);
+  }, [commitSnapshot, locale]);
 
   useEffect(() => {
     const local = readLocal();
@@ -121,12 +167,18 @@ export function SelectionsProvider({ children }: { children: ReactNode }) {
       setIsReady(true);
     });
     if (local.length) {
-      void enrichSelectionItems(local.map(toRecord), locale).then((enriched) => {
-        if (enriched.length) commit(enriched);
-      });
+      const records = local.map(toRecord);
+      const version = editVersionRef.current;
+      void enrichSelectionItems(records, locale)
+        .then((enriched) => {
+          if (enriched.length) commitSnapshot(enriched, records, version);
+        })
+        .catch(() => {
+          /* keep cached snapshot */
+        });
     }
     return () => cancelAnimationFrame(frame);
-  }, [commit, locale]);
+  }, [commitSnapshot, locale]);
 
   useEffect(() => {
     authedRef.current = status === "authenticated";
@@ -134,11 +186,11 @@ export function SelectionsProvider({ children }: { children: ReactNode }) {
     if (status === "authenticated" && !syncedRef.current) {
       syncedRef.current = true;
       void (async () => {
+        const records = itemsRef.current.map(toRecord);
+        const version = editVersionRef.current;
         try {
-          const merged = await mergeServerSelections(
-            itemsRef.current.map(toRecord),
-          );
-          commit(merged);
+          const merged = await mergeServerSelections(records);
+          commitSnapshot(merged, records, version);
         } catch {
           /* keep local */
         }
@@ -148,7 +200,7 @@ export function SelectionsProvider({ children }: { children: ReactNode }) {
     if (status === "unauthenticated") {
       syncedRef.current = false;
     }
-  }, [status, commit]);
+  }, [status, commitSnapshot]);
 
   const add = useCallback(
     (item: SelectionItem) => {
@@ -172,12 +224,12 @@ export function SelectionsProvider({ children }: { children: ReactNode }) {
         next = [changed, ...prev];
       }
 
-      commit(next);
+      commitEdit(next);
       setAddGeneration((g) => g + 1);
       setLastAddedSlug(item.workSlug);
       if (authedRef.current) void saveServerSelection(toRecord(changed));
     },
-    [commit],
+    [commitEdit],
   );
 
   const setQuantity = useCallback(
@@ -190,26 +242,26 @@ export function SelectionsProvider({ children }: { children: ReactNode }) {
       const next = [...prev];
       next[idx] = changed;
 
-      commit(next);
+      commitEdit(next);
       setAddGeneration((g) => g + 1);
       setLastAddedSlug(workSlug);
       if (authedRef.current) void saveServerSelection(toRecord(changed));
     },
-    [commit],
+    [commitEdit],
   );
 
   const remove = useCallback(
     (workSlug: string) => {
-      commit(itemsRef.current.filter((i) => i.workSlug !== workSlug));
+      commitEdit(itemsRef.current.filter((i) => i.workSlug !== workSlug));
       if (authedRef.current) void removeServerSelection(workSlug);
     },
-    [commit],
+    [commitEdit],
   );
 
   const clear = useCallback(() => {
-    commit([]);
+    commitEdit([]);
     if (authedRef.current) void clearServerSelections();
-  }, [commit]);
+  }, [commitEdit]);
 
   const has = useCallback(
     (workSlug: string) => items.some((i) => i.workSlug === workSlug),

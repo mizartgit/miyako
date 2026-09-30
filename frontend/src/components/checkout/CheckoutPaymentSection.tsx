@@ -6,6 +6,7 @@ import { useEffect, useState, useTransition } from "react";
 import {
   prepareStripeCheckout,
   type CheckoutQuote,
+  type PrepareCheckoutResult,
 } from "@/lib/actions/checkout";
 import { formatMoney } from "@/lib/commerce/currency";
 import { StripePaymentForm, type StripeBillingDetails } from "./StripePaymentForm";
@@ -69,12 +70,20 @@ export function CheckoutPaymentSection({
     setQuote(null);
 
     startTransition(async () => {
-      const result = await prepareStripeCheckout({
-        cartId,
-        email: contactEmail,
-        shippingAddress,
-        shippingOptionId: shippingOptionId || undefined,
-      });
+      // A dropped request rejects here; uncaught, it replaces the whole page
+      // with the global error screen. Preparing again on the same cart is safe.
+      let result: PrepareCheckoutResult;
+      try {
+        result = await prepareStripeCheckout({
+          cartId,
+          email: contactEmail,
+          shippingAddress,
+          shippingOptionId: shippingOptionId || undefined,
+        });
+      } catch {
+        setError(t("prepareFailed"));
+        return;
+      }
 
       if (!result.ok) {
         setError(result.error);
