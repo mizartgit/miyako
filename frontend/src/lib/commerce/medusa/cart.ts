@@ -53,7 +53,16 @@ type PaymentProvidersResponse = {
 };
 
 type CompleteCartResponse =
-  | { type: "order"; order: { id: string; display_id?: number } }
+  | {
+      type: "order";
+      order: {
+        id: string;
+        display_id?: number;
+        email?: string | null;
+        total?: unknown;
+        currency_code?: string;
+      };
+    }
   | { type: "cart"; cart: MedusaCart; error?: { message?: string } };
 
 const CART_FIELDS = [

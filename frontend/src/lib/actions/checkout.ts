@@ -18,6 +18,8 @@ import {
 } from "@/lib/commerce/medusa/cart";
 import { isMedusaConfigured } from "@/lib/commerce/medusa/client";
 import { isStripeConfigured } from "@/lib/commerce/stripe";
+import { auth } from "@/auth";
+import { isDbConfigured, prisma } from "@/lib/db";
 
 export type PrepareCheckoutInput = {
   cartId: string;
@@ -155,6 +157,45 @@ export type CompleteCheckoutResult =
   | { ok: true; orderId: string; displayId?: number }
   | { ok: false; error: string };
 
+type CompletedOrder = Extract<
+  Awaited<ReturnType<typeof completeCart>>,
+  { type: "order" }
+>["order"];
+
+/**
+ * Records the order in OrderMirror for Order History. Signed-in orders carry
+ * the user's id; guest orders keep userId null. Never throws — the payment has
+ * already succeeded, so a mirror failure must not surface as a checkout error.
+ */
+async function mirrorOrder(order: CompletedOrder): Promise<void> {
+  if (!isDbConfigured()) return;
+
+  try {
+    const session = await auth();
+    const currency = (order.currency_code ?? "jpy").toUpperCase();
+
+    await prisma.orderMirror.upsert({
+      where: { medusaOrderId: order.id },
+      create: {
+        medusaOrderId: order.id,
+        medusaDisplayId:
+          order.display_id != null ? String(order.display_id) : null,
+        userId: session?.user?.id ?? null,
+        customerEmail: order.email ?? null,
+        status: "PENDING",
+        totalJpy: currency === "JPY" ? Math.round(moneyAmount(order.total)) : null,
+        currency,
+      },
+      update: {},
+    });
+  } catch (err) {
+    console.error(
+      `[checkout] OrderMirror sync failed for ${order.id}:`,
+      err instanceof Error ? err.message : err,
+    );
+  }
+}
+
 /** Completes the Medusa cart after Stripe confirms payment. */
 export async function completeStripeCheckout(
   cartId: string,
@@ -169,6 +210,7 @@ export async function completeStripeCheckout(
     const result = await completeCart(cartId);
 
     if (result.type === "order" && result.order?.id) {
+      await mirrorOrder(result.order);
       return {
         ok: true,
         orderId: result.order.id,
