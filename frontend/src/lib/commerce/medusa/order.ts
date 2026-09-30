@@ -1,3 +1,4 @@
+import type { OrderSyncSnapshot } from "@/lib/orders/status";
 import { moneyAmount } from "./cart";
 import { medusaFetch } from "./client";
 
@@ -141,5 +142,70 @@ export async function retrieveOrder(id: string): Promise<OrderDetail> {
           countryCode: address.country_code ?? "",
         }
       : null,
+  };
+}
+
+const SYNC_FIELDS = [
+  "id",
+  "status",
+  "payment_status",
+  "fulfillment_status",
+  "*items",
+  "items.detail.shipped_quantity",
+  "items.detail.delivered_quantity",
+  "*fulfillments",
+  "*fulfillments.labels",
+].join(",");
+
+type MedusaOrderSyncResponse = {
+  order: {
+    id: string;
+    status?: string | null;
+    payment_status?: string | null;
+    fulfillment_status?: string | null;
+    items?: {
+      quantity?: unknown;
+      detail?: { shipped_quantity?: unknown; delivered_quantity?: unknown } | null;
+    }[];
+    fulfillments?: {
+      created_at?: string | null;
+      shipped_at?: string | null;
+      delivered_at?: string | null;
+      canceled_at?: string | null;
+      labels?: { tracking_number?: string | null; tracking_url?: string | null }[];
+    }[];
+  };
+};
+
+/**
+ * Server-only: current status/fulfillment state for OrderMirror sync.
+ * Medusa fulfillments here are the warehouse → customer shipment only.
+ */
+export async function retrieveOrderSyncSnapshot(
+  id: string,
+): Promise<OrderSyncSnapshot> {
+  const { order } = await medusaFetch<MedusaOrderSyncResponse>(
+    `/store/orders/${encodeURIComponent(id)}?fields=${encodeURIComponent(SYNC_FIELDS)}`,
+  );
+
+  return {
+    status: order.status ?? "",
+    paymentStatus: order.payment_status ?? "",
+    fulfillmentStatus: order.fulfillment_status ?? "",
+    items: (order.items ?? []).map((item) => ({
+      quantity: moneyAmount(item.quantity),
+      shippedQuantity: moneyAmount(item.detail?.shipped_quantity),
+      deliveredQuantity: moneyAmount(item.detail?.delivered_quantity),
+    })),
+    fulfillments: (order.fulfillments ?? []).map((f) => ({
+      createdAt: f.created_at ?? null,
+      shippedAt: f.shipped_at ?? null,
+      deliveredAt: f.delivered_at ?? null,
+      canceledAt: f.canceled_at ?? null,
+      labels: (f.labels ?? []).map((label) => ({
+        trackingNumber: label.tracking_number ?? null,
+        trackingUrl: label.tracking_url ?? null,
+      })),
+    })),
   };
 }
