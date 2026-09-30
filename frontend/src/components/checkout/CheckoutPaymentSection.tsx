@@ -2,21 +2,35 @@
 
 import { useTranslations } from "next-intl";
 import { useSession } from "next-auth/react";
-import { useState, useTransition } from "react";
-import { prepareStripeCheckout } from "@/lib/actions/checkout";
+import { useEffect, useState, useTransition } from "react";
+import {
+  prepareStripeCheckout,
+  type CheckoutQuote,
+} from "@/lib/actions/checkout";
+import { formatMoney } from "@/lib/commerce/currency";
 import { StripePaymentForm } from "./StripePaymentForm";
 
 const fieldClass =
-  "w-full border-b border-charcoal/20 bg-transparent py-3 text-charcoal outline-none transition-[border-color] duration-500 focus:border-gold";
+  "w-full border-b border-charcoal/20 bg-transparent py-3 text-charcoal outline-none transition-[border-color] duration-500 focus:border-gold disabled:cursor-not-allowed disabled:opacity-50";
+
+const alertClass =
+  "border border-charcoal/15 px-4 py-3 text-sm leading-relaxed text-charcoal";
+
+const buttonClass =
+  "w-full border border-charcoal bg-charcoal px-8 py-4 text-[11px] uppercase tracking-[0.25em] text-stone transition-colors duration-500 hover:border-gold hover:bg-ink hover:text-gold disabled:cursor-not-allowed disabled:opacity-50";
 
 type CheckoutPaymentSectionProps = {
   cartId: string;
   isGuest: boolean;
+  onQuote: (quote: CheckoutQuote | null) => void;
+  onPendingChange: (pending: boolean) => void;
 };
 
 export function CheckoutPaymentSection({
   cartId,
   isGuest,
+  onQuote,
+  onPendingChange,
 }: CheckoutPaymentSectionProps) {
   const t = useTranslations("checkout");
   const { data: session } = useSession();
@@ -28,6 +42,11 @@ export function CheckoutPaymentSection({
   const [shippingOptions, setShippingOptions] = useState<
     { id: string; name: string; amount: number }[]
   >([]);
+  const [quote, setQuote] = useState<CheckoutQuote | null>(null);
+
+  useEffect(() => {
+    onPendingChange(pending);
+  }, [onPendingChange, pending]);
 
   function handlePrepare(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
@@ -45,6 +64,9 @@ export function CheckoutPaymentSection({
       phone: ((form.get("phone") as string) || undefined)?.trim(),
     };
 
+    onQuote(null);
+    setQuote(null);
+
     startTransition(async () => {
       const result = await prepareStripeCheckout({
         cartId,
@@ -58,21 +80,43 @@ export function CheckoutPaymentSection({
         return;
       }
 
+      const nextQuote: CheckoutQuote = {
+        currencyCode: result.currencyCode,
+        subtotal: result.subtotal,
+        shippingAmount: result.shippingAmount,
+        shippingName: result.shippingName,
+        total: result.total,
+      };
       setEmail(contactEmail);
       setShippingOptions(result.shippingOptions);
       if (!shippingOptionId && result.shippingOptions[0]) {
         setShippingOptionId(result.shippingOptions[0].id);
       }
+      setQuote(nextQuote);
+      onQuote(nextQuote);
       setClientSecret(result.clientSecret);
     });
   }
 
   if (clientSecret) {
     return (
-      <div className="space-y-8">
+      <div className="space-y-10">
         <h2 className="text-[10px] uppercase tracking-[0.3em] text-gold-muted">
           {t("paymentTitle")}
         </h2>
+        {quote?.shippingName ? (
+          <p className="flex items-baseline justify-between gap-6 text-sm">
+            <span className="text-charcoal/70">
+              {t("shipping")}
+              <span className="mt-1 block text-[11px] tracking-wide text-charcoal/45">
+                {quote.shippingName}
+              </span>
+            </span>
+            <span className="shrink-0 tabular-nums text-charcoal">
+              {formatMoney(quote.shippingAmount, quote.currencyCode)}
+            </span>
+          </p>
+        ) : null}
         <StripePaymentForm
           cartId={cartId}
           clientSecret={clientSecret}
@@ -83,7 +127,8 @@ export function CheckoutPaymentSection({
   }
 
   return (
-    <form onSubmit={handlePrepare} className="space-y-8">
+    <form onSubmit={handlePrepare} className="space-y-8" aria-busy={pending}>
+      <fieldset disabled={pending} className="min-w-0 space-y-8 border-0 p-0">
       <h2 className="text-[10px] uppercase tracking-[0.3em] text-gold-muted">
         {t("shippingTitle")}
       </h2>
@@ -249,6 +294,7 @@ export function CheckoutPaymentSection({
             id="shipping_option"
             value={shippingOptionId}
             onChange={(e) => setShippingOptionId(e.target.value)}
+            disabled={pending}
             className={fieldClass}
           >
             {shippingOptions.map((o) => (
@@ -261,7 +307,7 @@ export function CheckoutPaymentSection({
       )}
 
       {error && (
-        <p className="text-sm text-charcoal/70" role="alert">
+        <p className={alertClass} role="alert">
           {error}
         </p>
       )}
@@ -269,10 +315,12 @@ export function CheckoutPaymentSection({
       <button
         type="submit"
         disabled={pending}
-        className="w-full border border-charcoal bg-charcoal px-8 py-4 text-[11px] uppercase tracking-[0.25em] text-stone transition-all duration-500 hover:border-gold hover:bg-ink hover:text-gold disabled:opacity-50"
+        aria-busy={pending}
+        className={buttonClass}
       >
         {pending ? t("preparingPayment") : t("continueToPayment")}
       </button>
+      </fieldset>
     </form>
   );
 }

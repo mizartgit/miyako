@@ -10,12 +10,22 @@ export type MedusaAddress = {
   phone?: string;
 };
 
+export type MedusaShippingMethod = {
+  id: string;
+  name?: string;
+  amount?: number;
+  shipping_option?: { name?: string } | null;
+};
+
 export type MedusaCart = {
   id: string;
   email?: string | null;
   region_id?: string;
   total?: number;
+  item_subtotal?: number;
+  shipping_total?: number;
   currency_code?: string;
+  shipping_methods?: MedusaShippingMethod[];
   payment_collection?: {
     id: string;
     payment_sessions?: {
@@ -46,9 +56,34 @@ type CompleteCartResponse =
   | { type: "order"; order: { id: string; display_id?: number } }
   | { type: "cart"; cart: MedusaCart; error?: { message?: string } };
 
+const CART_FIELDS = [
+  "*payment_collection",
+  "*payment_collection.payment_sessions",
+  "*shipping_methods",
+  "*shipping_methods.shipping_option",
+  "currency_code",
+  "item_subtotal",
+  "shipping_total",
+  "total",
+  "region_id",
+].join(",");
+
+export function moneyAmount(value: unknown): number {
+  if (typeof value === "number" && Number.isFinite(value)) return value;
+  if (typeof value === "string" && value.trim() !== "") {
+    const parsed = Number(value);
+    return Number.isFinite(parsed) ? parsed : 0;
+  }
+  if (value && typeof value === "object" && "numeric" in value) {
+    const parsed = Number((value as { numeric?: unknown }).numeric);
+    return Number.isFinite(parsed) ? parsed : 0;
+  }
+  return 0;
+}
+
 export async function retrieveCart(cartId: string): Promise<MedusaCart> {
   const { cart } = await medusaFetch<CartResponse>(
-    `/store/carts/${cartId}?fields=*payment_collection,*payment_collection.payment_sessions`,
+    `/store/carts/${cartId}?fields=${CART_FIELDS}`,
   );
   return cart;
 }

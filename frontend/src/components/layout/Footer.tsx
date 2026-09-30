@@ -18,7 +18,7 @@ export async function Footer() {
             </p>
           </div>
 
-          <div className="flex gap-16">
+          <div className="flex flex-col gap-10 sm:flex-row sm:gap-16">
             <div>
               <p className="mb-4 text-[10px] uppercase tracking-[0.3em] text-gold-muted">
                 {t("explore")}

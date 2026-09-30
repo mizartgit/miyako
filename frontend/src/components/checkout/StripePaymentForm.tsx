@@ -84,15 +84,19 @@ function StripeCheckoutForm({
       />
 
       {error && (
-        <p className="text-sm text-charcoal/70" role="alert">
+        <p
+          className="border border-charcoal/15 px-4 py-3 text-sm leading-relaxed text-charcoal"
+          role="alert"
+        >
           {error}
         </p>
       )}
 
       <button
         type="submit"
-        disabled={!stripe || pending}
-        className="w-full border border-charcoal bg-charcoal px-8 py-4 text-[11px] uppercase tracking-[0.25em] text-stone transition-all duration-500 hover:border-gold hover:bg-ink hover:text-gold disabled:opacity-50"
+        disabled={!stripe || !elements || pending}
+        aria-busy={pending}
+        className="w-full border border-charcoal bg-charcoal px-8 py-4 text-[11px] uppercase tracking-[0.25em] text-stone transition-colors duration-500 hover:border-gold hover:bg-ink hover:text-gold disabled:cursor-not-allowed disabled:opacity-50"
       >
         {pending ? t("processingPayment") : t("placeOrder")}
       </button>

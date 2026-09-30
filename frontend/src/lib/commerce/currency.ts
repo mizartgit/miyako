@@ -70,9 +70,8 @@ export function convertFromJpy(amountJpy: number, currency: Currency): number {
   return amountJpy * EXCHANGE_RATES_FROM_JPY[currency];
 }
 
-export function formatPrice(amount: number, currency: Currency): string {
-  const fractionDigits =
-    currency === "JPY" || currency === "KRW" ? 0 : 2;
+function formatWithIntl(amount: number, currency: string): string {
+  const fractionDigits = currency === "JPY" || currency === "KRW" ? 0 : 2;
 
   return new Intl.NumberFormat(undefined, {
     style: "currency",
@@ -80,6 +79,20 @@ export function formatPrice(amount: number, currency: Currency): string {
     minimumFractionDigits: fractionDigits,
     maximumFractionDigits: fractionDigits,
   }).format(amount);
+}
+
+export function formatPrice(amount: number, currency: Currency): string {
+  return formatWithIntl(amount, currency);
+}
+
+/** Format an amount in the cart or region currency. Does not convert. */
+export function formatMoney(amount: number, currencyCode: string): string {
+  const code = currencyCode.trim().toUpperCase() || "JPY";
+  try {
+    return formatWithIntl(amount, code);
+  } catch {
+    return formatWithIntl(amount, "JPY");
+  }
 }
 
 export function formatPriceFromJpy(amountJpy: number, currency: Currency): string {

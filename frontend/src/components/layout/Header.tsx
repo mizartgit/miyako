@@ -95,9 +95,7 @@ export function Header() {
           <SelectionsLink solid={iconSolid} />
           <AccountMenu solid={iconSolid} />
 
-          <div className="flex items-center gap-4 md:hidden">
-            <CurrencySwitcher solid={iconSolid} />
-            <LanguageSwitcher solid={iconSolid} />
+          <div className="flex items-center md:hidden">
             <button
               type="button"
               aria-label={menuOpen ? t("closeMenu") : t("openMenu")}
@@ -129,10 +127,10 @@ export function Header() {
 
       <nav
         aria-hidden={!menuOpen}
-        className={`overflow-hidden border-t border-gold/10 bg-stone/98 backdrop-blur-md transition-all duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] md:hidden ${
+        className={`border-t border-gold/10 bg-stone/98 backdrop-blur-md transition-all duration-700 ease-[cubic-bezier(0.16,1,0.3,1)] md:hidden ${
           menuOpen
-            ? "max-h-80 opacity-100"
-            : "pointer-events-none max-h-0 opacity-0"
+            ? "max-h-[28rem] overflow-visible opacity-100"
+            : "pointer-events-none max-h-0 overflow-hidden opacity-0"
         }`}
       >
         <div className="flex flex-col gap-1 px-6 py-6">
@@ -153,6 +151,10 @@ export function Header() {
               {label}
             </Link>
           ))}
+          <div className="flex items-center gap-8 py-3">
+            <LanguageSwitcher solid />
+            <CurrencySwitcher solid />
+          </div>
           <button
             type="button"
             onClick={() => {

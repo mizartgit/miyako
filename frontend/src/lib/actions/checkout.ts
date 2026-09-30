@@ -4,14 +4,17 @@ import {
   createSelectionsCart,
   type SelectionCartLine,
 } from "@/lib/commerce/medusa/checkout";
+import { getTranslations } from "next-intl/server";
 import {
   addShippingMethod,
   completeCart,
   initiateStripePaymentSession,
   listShippingOptions,
+  moneyAmount,
   retrieveCart,
   updateCart,
   type MedusaAddress,
+  type MedusaCart,
 } from "@/lib/commerce/medusa/cart";
 import { isMedusaConfigured } from "@/lib/commerce/medusa/client";
 import { isStripeConfigured } from "@/lib/commerce/stripe";
@@ -23,15 +26,52 @@ export type PrepareCheckoutInput = {
   shippingOptionId?: string;
 };
 
+export type CheckoutQuote = {
+  currencyCode: string;
+  subtotal: number;
+  shippingAmount: number;
+  shippingName: string;
+  total: number;
+};
+
 export type PrepareCheckoutResult =
-  | {
+  | ({
       ok: true;
       cartTotal: number;
       currencyCode: string;
       shippingOptions: { id: string; name: string; amount: number }[];
       clientSecret: string;
-    }
+    } & CheckoutQuote)
   | { ok: false; error: string };
+
+function quoteFromCart(
+  cart: MedusaCart,
+  selectedName: string,
+  selectedAmount: number,
+): CheckoutQuote {
+  const currencyCode = (cart.currency_code ?? "jpy").toUpperCase();
+  const shippingAmount =
+    cart.shipping_total == null
+      ? moneyAmount(selectedAmount)
+      : moneyAmount(cart.shipping_total);
+  const total = moneyAmount(cart.total);
+  const subtotalFromCart = moneyAmount(cart.item_subtotal);
+  const subtotal =
+    subtotalFromCart > 0 ? subtotalFromCart : Math.max(0, total - shippingAmount);
+  const method = cart.shipping_methods?.[0];
+  const shippingName =
+    method?.name ||
+    method?.shipping_option?.name ||
+    selectedName;
+
+  return {
+    currencyCode,
+    subtotal,
+    shippingAmount,
+    shippingName,
+    total,
+  };
+}
 
 /**
  * Begins checkout from the visitor's Selections.
@@ -46,14 +86,13 @@ export async function startSelectionsCheckout(lines: SelectionCartLine[]) {
 export async function prepareStripeCheckout(
   input: PrepareCheckoutInput,
 ): Promise<PrepareCheckoutResult> {
+  const t = await getTranslations("checkout");
+
   if (!isMedusaConfigured()) {
-    return { ok: false, error: "Commerce backend is not configured." };
+    return { ok: false, error: t("commerceNotConfigured") };
   }
   if (!isStripeConfigured()) {
-    return {
-      ok: false,
-      error: "Stripe is not configured. Add NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY.",
-    };
+    return { ok: false, error: t("stripeNotConfigured") };
   }
 
   try {
@@ -65,23 +104,22 @@ export async function prepareStripeCheckout(
 
     const shippingOptions = await listShippingOptions(input.cartId);
     if (shippingOptions.length === 0) {
-      return {
-        ok: false,
-        error:
-          "No shipping options are configured for your address. Add shipping in Medusa Admin → Settings → Locations.",
-      };
+      return { ok: false, error: t("shippingUnavailable") };
     }
 
-    const optionId =
-      input.shippingOptionId &&
-      shippingOptions.some((o) => o.id === input.shippingOptionId)
-        ? input.shippingOptionId
-        : shippingOptions[0].id;
+    const selected =
+      (input.shippingOptionId
+        ? shippingOptions.find((o) => o.id === input.shippingOptionId)
+        : undefined) ?? shippingOptions[0];
 
-    let cart = await addShippingMethod(input.cartId, optionId);
+    if (!selected) {
+      return { ok: false, error: t("shippingUnavailable") };
+    }
 
-    if (!cart.total || cart.total <= 0) {
-      return { ok: false, error: "Cart total must be greater than zero." };
+    let cart = await addShippingMethod(input.cartId, selected.id);
+
+    if (moneyAmount(cart.total) <= 0) {
+      return { ok: false, error: t("totalRequired") };
     }
 
     cart = await initiateStripePaymentSession(cart);
@@ -92,28 +130,24 @@ export async function prepareStripeCheckout(
       )?.data?.client_secret;
 
     if (typeof clientSecret !== "string") {
-      return {
-        ok: false,
-        error:
-          "Could not start Stripe payment. Check STRIPE_API_KEY on the backend and enable Stripe in your Medusa region.",
-      };
+      return { ok: false, error: t("paymentFailed") };
     }
+
+    const quote = quoteFromCart(cart, selected.name, moneyAmount(selected.amount));
 
     return {
       ok: true,
-      cartTotal: cart.total ?? 0,
-      currencyCode: cart.currency_code ?? "jpy",
+      ...quote,
+      cartTotal: quote.total,
       shippingOptions: shippingOptions.map((o) => ({
         id: o.id,
         name: o.name,
-        amount: o.amount,
+        amount: moneyAmount(o.amount),
       })),
       clientSecret,
     };
-  } catch (err) {
-    const message =
-      err instanceof Error ? err.message : "Could not prepare checkout.";
-    return { ok: false, error: message };
+  } catch {
+    return { ok: false, error: t("prepareFailed") };
   }
 }
 
@@ -125,8 +159,10 @@ export type CompleteCheckoutResult =
 export async function completeStripeCheckout(
   cartId: string,
 ): Promise<CompleteCheckoutResult> {
+  const t = await getTranslations("checkout");
+
   if (!isMedusaConfigured()) {
-    return { ok: false, error: "Commerce backend is not configured." };
+    return { ok: false, error: t("commerceNotConfigured") };
   }
 
   try {
@@ -143,12 +179,10 @@ export async function completeStripeCheckout(
     const cartError = result.type === "cart" ? result.error?.message : undefined;
     return {
       ok: false,
-      error: cartError ?? "Order could not be completed.",
+      error: cartError ?? t("completeFailed"),
     };
-  } catch (err) {
-    const message =
-      err instanceof Error ? err.message : "Could not complete order.";
-    return { ok: false, error: message };
+  } catch {
+    return { ok: false, error: t("completeFailed") };
   }
 }
 

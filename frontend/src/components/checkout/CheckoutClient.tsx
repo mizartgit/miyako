@@ -5,12 +5,16 @@ import { signIn, useSession } from "next-auth/react";
 import { useState, useTransition } from "react";
 import { Link, useRouter } from "@/i18n/navigation";
 import { resolveSignInErrorMessage } from "@/lib/auth/client-errors";
-import { useCurrency } from "@/contexts/CurrencyContext";
 import { useSelections } from "@/contexts/SelectionsContext";
+import { formatMoney } from "@/lib/commerce/currency";
+import type { CheckoutQuote } from "@/lib/actions/checkout";
 import { CheckoutPaymentSection } from "@/components/checkout/CheckoutPaymentSection";
 
 const fieldClass =
   "w-full border-b border-charcoal/20 bg-transparent py-3 text-charcoal outline-none transition-[border-color] duration-500 focus:border-gold";
+
+const alertClass =
+  "border border-charcoal/15 px-4 py-3 text-sm leading-relaxed text-charcoal";
 
 type CheckoutClientProps = {
   cartId?: string;
@@ -19,8 +23,9 @@ type CheckoutClientProps = {
 export function CheckoutClient({ cartId }: CheckoutClientProps) {
   const t = useTranslations("checkout");
   const tAuth = useTranslations("auth");
-  const { formatJpy } = useCurrency();
   const { items, subtotalJpy, isReady } = useSelections();
+  const [quote, setQuote] = useState<CheckoutQuote | null>(null);
+  const [quotePending, setQuotePending] = useState(false);
   const { data: session, status } = useSession();
   const router = useRouter();
 
@@ -107,7 +112,7 @@ export function CheckoutClient({ cartId }: CheckoutClientProps) {
               </label>
 
               {error && (
-                <p className="text-sm text-charcoal/70" role="alert">
+                <p className={alertClass} role="alert">
                   {error}
                 </p>
               )}
@@ -115,7 +120,8 @@ export function CheckoutClient({ cartId }: CheckoutClientProps) {
               <button
                 type="submit"
                 disabled={pending}
-                className="w-full border border-gold/50 px-8 py-4 text-[11px] uppercase tracking-[0.25em] text-gold transition-all duration-500 hover:border-gold hover:bg-gold hover:text-ink disabled:opacity-50"
+                aria-busy={pending}
+                className="w-full border border-gold/50 px-8 py-4 text-[11px] uppercase tracking-[0.25em] text-gold transition-colors duration-500 hover:border-gold hover:bg-gold hover:text-ink disabled:cursor-not-allowed disabled:opacity-50"
               >
                 {pending ? t("signingIn") : t("signIn")}
               </button>
@@ -138,7 +144,12 @@ export function CheckoutClient({ cartId }: CheckoutClientProps) {
                 ? t("signedInAs", { email: session?.user?.email ?? "" })
                 : t("guestNote")}
             </p>
-            <CheckoutPaymentSection cartId={cartId} isGuest={!isAuthed} />
+            <CheckoutPaymentSection
+              cartId={cartId}
+              isGuest={!isAuthed}
+              onQuote={setQuote}
+              onPendingChange={setQuotePending}
+            />
             <Link href="/selections" className="link-underline text-sm text-gold">
               {t("backToSelections")}
             </Link>
@@ -160,31 +171,66 @@ export function CheckoutClient({ cartId }: CheckoutClientProps) {
             {t("orderSummary")}
           </h2>
 
-          {isReady && items.length > 0 ? (
-            <ul className="mt-6 space-y-4 text-sm">
+          {!isReady ? (
+            <p className="mt-6 text-sm text-charcoal/50" aria-live="polite">
+              {t("summaryLoading")}
+            </p>
+          ) : items.length > 0 ? (
+            <ul className="mt-8 space-y-5 text-sm">
               {items.map((item) => (
-                <li key={item.workSlug} className="flex justify-between gap-4">
+                <li key={item.workSlug} className="flex justify-between gap-6">
                   <span className="text-charcoal/70">
-                    {(item.titleJa ?? item.title)}
+                    {item.titleJa ?? item.title}
                     {item.quantity > 1 ? ` × ${item.quantity}` : ""}
                   </span>
-                  <span className="shrink-0 text-charcoal">
+                  <span className="shrink-0 tabular-nums text-charcoal">
                     {item.priceJpy > 0
-                      ? formatJpy(item.priceJpy * item.quantity)
+                      ? formatMoney(item.priceJpy * item.quantity, "JPY")
                       : "—"}
                   </span>
                 </li>
               ))}
             </ul>
           ) : (
-            <p className="mt-6 text-sm text-charcoal/50">{t("emptySummary")}</p>
+            <p className="mt-8 text-sm text-charcoal/50">{t("emptySummary")}</p>
           )}
 
-          <dl className="mt-6 border-t border-charcoal/10 pt-6 text-sm">
-            <div className="flex items-center justify-between">
+          <dl className="mt-8 space-y-3 border-t border-charcoal/10 pt-6 text-sm">
+            <div className="flex items-baseline justify-between gap-6">
               <dt className="text-charcoal/60">{t("subtotal")}</dt>
-              <dd className="text-charcoal">
-                {subtotalJpy > 0 ? formatJpy(subtotalJpy) : "—"}
+              <dd className="tabular-nums text-charcoal">
+                {quote
+                  ? formatMoney(quote.subtotal, quote.currencyCode)
+                  : subtotalJpy > 0
+                    ? formatMoney(subtotalJpy, "JPY")
+                    : "—"}
+              </dd>
+            </div>
+            <div className="flex items-baseline justify-between gap-6">
+              <dt className="text-charcoal/60">
+                {t("shipping")}
+                {quote?.shippingName ? (
+                  <span className="mt-1 block text-[11px] tracking-wide text-charcoal/45">
+                    {quote.shippingName}
+                  </span>
+                ) : null}
+              </dt>
+              <dd className="shrink-0 tabular-nums text-charcoal">
+                {quote
+                  ? formatMoney(quote.shippingAmount, quote.currencyCode)
+                  : quotePending
+                    ? t("preparingPayment")
+                    : t("shippingAtPayment")}
+              </dd>
+            </div>
+            <div className="flex items-baseline justify-between gap-6 border-t border-charcoal/10 pt-4">
+              <dt className="font-serif text-base text-charcoal">{t("total")}</dt>
+              <dd className="font-serif text-base tabular-nums text-charcoal">
+                {quote
+                  ? formatMoney(quote.total, quote.currencyCode)
+                  : subtotalJpy > 0
+                    ? formatMoney(subtotalJpy, "JPY")
+                    : "—"}
               </dd>
             </div>
           </dl>

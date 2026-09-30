@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import { useTranslations } from "next-intl";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Link, useRouter } from "@/i18n/navigation";
 import { DualTitle } from "@/components/ui/DualTitle";
 import { AnimatedNumber, AnimatedPresence } from "@/components/ui/AnimatedNumber";
@@ -23,15 +23,10 @@ export function SelectionsClient() {
     lastAddedSlug,
     remove,
     setQuantity,
-    refreshFromMedusa,
   } = useSelections();
   const router = useRouter();
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    if (isReady && items.length) void refreshFromMedusa();
-  }, [isReady, refreshFromMedusa, items.length]);
 
   const purchasable = items.filter((i) => i.variantId && i.available);
   const distinctCount = items.length;
