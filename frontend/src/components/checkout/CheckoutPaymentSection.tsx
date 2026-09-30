@@ -8,7 +8,7 @@ import {
   type CheckoutQuote,
 } from "@/lib/actions/checkout";
 import { formatMoney } from "@/lib/commerce/currency";
-import { StripePaymentForm } from "./StripePaymentForm";
+import { StripePaymentForm, type StripeBillingDetails } from "./StripePaymentForm";
 
 const fieldClass =
   "w-full border-b border-charcoal/20 bg-transparent py-3 text-charcoal outline-none transition-[border-color] duration-500 focus:border-gold disabled:cursor-not-allowed disabled:opacity-50";
@@ -38,6 +38,7 @@ export function CheckoutPaymentSection({
   const [error, setError] = useState<string | null>(null);
   const [clientSecret, setClientSecret] = useState<string | null>(null);
   const [email, setEmail] = useState(session?.user?.email ?? "");
+  const [billing, setBilling] = useState<StripeBillingDetails | null>(null);
   const [shippingOptionId, setShippingOptionId] = useState<string>("");
   const [shippingOptions, setShippingOptions] = useState<
     { id: string; name: string; amount: number }[]
@@ -88,6 +89,16 @@ export function CheckoutPaymentSection({
         total: result.total,
       };
       setEmail(contactEmail);
+      setBilling({
+        name: `${shippingAddress.first_name} ${shippingAddress.last_name}`.trim(),
+        phone: shippingAddress.phone || undefined,
+        address: {
+          line1: shippingAddress.address_1,
+          city: shippingAddress.city,
+          postal_code: shippingAddress.postal_code,
+          country: shippingAddress.country_code.toUpperCase(),
+        },
+      });
       setShippingOptions(result.shippingOptions);
       if (!shippingOptionId && result.shippingOptions[0]) {
         setShippingOptionId(result.shippingOptions[0].id);
@@ -117,11 +128,14 @@ export function CheckoutPaymentSection({
             </span>
           </p>
         ) : null}
-        <StripePaymentForm
-          cartId={cartId}
-          clientSecret={clientSecret}
-          email={email}
-        />
+        {billing ? (
+          <StripePaymentForm
+            cartId={cartId}
+            clientSecret={clientSecret}
+            email={email}
+            billing={billing}
+          />
+        ) : null}
       </div>
     );
   }

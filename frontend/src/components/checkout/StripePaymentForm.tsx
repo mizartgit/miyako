@@ -7,12 +7,23 @@ import {
   useStripe,
 } from "@stripe/react-stripe-js";
 import { loadStripe } from "@stripe/stripe-js";
-import { useTranslations } from "next-intl";
-import { useState } from "react";
+import { useLocale, useTranslations } from "next-intl";
+import { useRef, useState } from "react";
 import { useRouter } from "@/i18n/navigation";
 import { completeStripeCheckout } from "@/lib/actions/checkout";
 import { getStripePublishableKey } from "@/lib/commerce/stripe";
 import { useSelections } from "@/contexts/SelectionsContext";
+
+export type StripeBillingDetails = {
+  name: string;
+  phone?: string;
+  address: {
+    line1: string;
+    city: string;
+    postal_code: string;
+    country: string;
+  };
+};
 
 const stripePromise = loadStripe(getStripePublishableKey());
 
@@ -20,59 +31,101 @@ type StripePaymentFormProps = {
   cartId: string;
   clientSecret: string;
   email: string;
+  billing: StripeBillingDetails;
 };
 
 function StripeCheckoutForm({
   cartId,
-  clientSecret,
   email,
+  billing,
 }: StripePaymentFormProps) {
   const t = useTranslations("checkout");
+  const locale = useLocale();
   const router = useRouter();
   const { clear } = useSelections();
   const stripe = useStripe();
   const elements = useElements();
   const [error, setError] = useState<string | null>(null);
   const [pending, setPending] = useState(false);
+  const submitting = useRef(false);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    if (!stripe || !elements) return;
+    if (!stripe || !elements || submitting.current) return;
 
-    setPending(true);
+    submitting.current = true;
     setError(null);
 
-    const { error: stripeError } = await stripe.confirmPayment({
-      elements,
-      clientSecret,
-      confirmParams: {
-        return_url: `${window.location.origin}/checkout/success?cart_id=${cartId}`,
-        payment_method_data: {
-          billing_details: { email },
+    try {
+      // Collect the card while the button is still enabled. Disabling it
+      // first leaves confirmPayment waiting on the Payment Element forever.
+      const { error: submitError } = await elements.submit();
+      if (submitError) {
+        setError(submitError.message ?? t("paymentFailed"));
+        return;
+      }
+
+      setPending(true);
+
+      const { error: stripeError, paymentIntent } = await stripe.confirmPayment({
+        elements,
+        confirmParams: {
+          return_url: `${window.location.origin}/${locale}/checkout/success?cart_id=${cartId}`,
+          payment_method_data: {
+            billing_details: {
+              email,
+              name: billing.name,
+              phone: billing.phone || undefined,
+              address: {
+                line1: billing.address.line1,
+                city: billing.address.city,
+                postal_code: billing.address.postal_code,
+                country: billing.address.country,
+              },
+            },
+          },
         },
-      },
-      redirect: "if_required",
-    });
+        redirect: "if_required",
+      });
 
-    if (stripeError) {
-      setError(stripeError.message ?? t("paymentFailed"));
+      if (stripeError) {
+        setError(stripeError.message ?? t("paymentFailed"));
+        return;
+      }
+
+      const status = paymentIntent?.status;
+      if (
+        status &&
+        status !== "succeeded" &&
+        status !== "requires_capture" &&
+        status !== "processing"
+      ) {
+        setError(t("paymentFailed"));
+        return;
+      }
+
+      let result = await completeStripeCheckout(cartId);
+      if (!result.ok) {
+        await new Promise((resolve) => setTimeout(resolve, 1500));
+        result = await completeStripeCheckout(cartId);
+      }
+      if (!result.ok) {
+        setError(result.error);
+        return;
+      }
+
+      clear();
+      router.push(
+        `/checkout/success?order_id=${result.orderId}${
+          result.displayId != null ? `&display_id=${result.displayId}` : ""
+        }`,
+      );
+    } catch (err) {
+      setError(err instanceof Error && err.message ? err.message : t("paymentFailed"));
+    } finally {
+      submitting.current = false;
       setPending(false);
-      return;
     }
-
-    const result = await completeStripeCheckout(cartId);
-    if (!result.ok) {
-      setError(result.error);
-      setPending(false);
-      return;
-    }
-
-    clear();
-    router.push(
-      `/checkout/success?order_id=${result.orderId}${
-        result.displayId != null ? `&display_id=${result.displayId}` : ""
-      }`,
-    );
   }
 
   return (
@@ -80,6 +133,9 @@ function StripeCheckoutForm({
       <PaymentElement
         options={{
           layout: "tabs",
+          fields: {
+            billingDetails: "never",
+          },
         }}
       />
 
