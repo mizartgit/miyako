@@ -274,7 +274,52 @@
     "emailChangeUnavailable": "Email is managed by your sign-in provider (e.g. Google).",
     "sessionSection": "Sign out",
     "signOutDescription": "Sign out of MIYAKO on this device.",
-    "quickActions": "Account"
+    "quickActions": "Account",
+    "orderNumber": "ご注文 #{number}",
+    "backToOrders": "注文履歴に戻る",
+    "orderDate": "注文日",
+    "orderStatus": "注文状況",
+    "paymentStatus": "お支払い",
+    "fulfillmentStatus": "発送状況",
+    "orderItems": "ご注文の作品",
+    "quantityLabel": "数量",
+    "unitPriceLabel": "単価",
+    "shippingMethod": "配送方法",
+    "orderSubtotal": "小計",
+    "orderShipping": "送料",
+    "orderTotal": "合計",
+    "shippingAddress": "お届け先",
+    "orderUnavailable": "現在、ご注文の詳細を表示できません。しばらくしてから再度お試しください。",
+    "orderStatusLabels": {
+      "pending": "受付済み",
+      "completed": "完了",
+      "canceled": "キャンセル",
+      "requires_action": "要対応",
+      "archived": "アーカイブ",
+      "draft": "下書き"
+    },
+    "paymentStatusLabels": {
+      "not_paid": "未払い",
+      "awaiting": "お支払い待ち",
+      "authorized": "承認済み",
+      "partially_authorized": "一部承認済み",
+      "captured": "お支払い済み",
+      "partially_captured": "一部お支払い済み",
+      "partially_refunded": "一部返金済み",
+      "refunded": "返金済み",
+      "canceled": "キャンセル",
+      "requires_action": "要対応"
+    },
+    "fulfillmentStatusLabels": {
+      "not_fulfilled": "準備中",
+      "partially_fulfilled": "一部準備完了",
+      "fulfilled": "発送準備完了",
+      "partially_shipped": "一部発送済み",
+      "shipped": "発送済み",
+      "partially_delivered": "一部配達済み",
+      "delivered": "配達済み",
+      "canceled": "キャンセル"
+    }
   },
   "search": {
     "title": "Search",

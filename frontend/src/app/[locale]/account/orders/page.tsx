@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { getTranslations, setRequestLocale } from "next-intl/server";
 import { auth } from "@/auth";
 import { AccountNav } from "@/components/account/AccountNav";
+import { Link } from "@/i18n/navigation";
 import { Reveal } from "@/components/ui/Reveal";
 import { isDbConfigured, prisma } from "@/lib/db";
 import { redirect } from "next/navigation";
@@ -60,10 +61,15 @@ export default async function OrdersPage({ params }: Props) {
                 key={order.id}
                 className="border border-charcoal/10 p-6 text-sm"
               >
-                <p className="font-serif text-lg text-charcoal">
-                  {order.medusaDisplayId ?? order.medusaOrderId}
-                </p>
-                <p className="mt-2 text-charcoal/60">{order.status}</p>
+                <Link
+                  href={`/account/orders/${order.medusaOrderId}`}
+                  className="block"
+                >
+                  <p className="font-serif text-lg text-charcoal">
+                    {order.medusaDisplayId ?? order.medusaOrderId}
+                  </p>
+                  <p className="mt-2 text-charcoal/60">{order.status}</p>
+                </Link>
                 {order.trackingUrl && (
                   <a
                     href={order.trackingUrl}

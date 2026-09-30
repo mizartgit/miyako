@@ -274,7 +274,52 @@
     "emailChangeUnavailable": "Email is managed by your sign-in provider (e.g. Google).",
     "sessionSection": "Sign out",
     "signOutDescription": "Sign out of MIYAKO on this device.",
-    "quickActions": "Account"
+    "quickActions": "Account",
+    "orderNumber": "Order #{number}",
+    "backToOrders": "Back to orders",
+    "orderDate": "Order date",
+    "orderStatus": "Order status",
+    "paymentStatus": "Payment",
+    "fulfillmentStatus": "Fulfillment",
+    "orderItems": "Items",
+    "quantityLabel": "Quantity",
+    "unitPriceLabel": "Unit price",
+    "shippingMethod": "Shipping method",
+    "orderSubtotal": "Subtotal",
+    "orderShipping": "Shipping",
+    "orderTotal": "Total",
+    "shippingAddress": "Shipping address",
+    "orderUnavailable": "Order details are temporarily unavailable. Please try again shortly.",
+    "orderStatusLabels": {
+      "pending": "Received",
+      "completed": "Completed",
+      "canceled": "Cancelled",
+      "requires_action": "Action required",
+      "archived": "Archived",
+      "draft": "Draft"
+    },
+    "paymentStatusLabels": {
+      "not_paid": "Not paid",
+      "awaiting": "Awaiting payment",
+      "authorized": "Authorized",
+      "partially_authorized": "Partially authorized",
+      "captured": "Paid",
+      "partially_captured": "Partially paid",
+      "partially_refunded": "Partially refunded",
+      "refunded": "Refunded",
+      "canceled": "Cancelled",
+      "requires_action": "Action required"
+    },
+    "fulfillmentStatusLabels": {
+      "not_fulfilled": "Preparing",
+      "partially_fulfilled": "Partially prepared",
+      "fulfilled": "Ready to ship",
+      "partially_shipped": "Partially shipped",
+      "shipped": "Shipped",
+      "partially_delivered": "Partially delivered",
+      "delivered": "Delivered",
+      "canceled": "Cancelled"
+    }
   },
   "search": {
     "title": "Search",
